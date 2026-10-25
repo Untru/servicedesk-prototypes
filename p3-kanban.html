@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Прототип 3 — канбан с прогрессом часов</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>x-dc{display:none}</style>
+<script src="preact.min.js"></script>
+<script src="dc-lite.js"></script>
+</head>
+<body>
+<div style="font-family: Inter, system-ui, sans-serif; background: #1C1C1A; padding: 10px 16px"><a href="./" style="color: #FFFFFF; font-size: 14px; text-decoration: none">← Все прототипы</a></div>
+<div id="dc-root"></div>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEEC}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1F5FBF;outline-offset:2px}
+a{color:#1F5FBF}a:hover{color:#16478F}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #1C1C1A; background: #EEEEEC; padding: 24px 16px; box-sizing: border-box; min-height: 800px">
+<div style="max-width: 1360px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 600">Мои заявки — доска</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<span style="font-size: 14px; color: #5C5C58; font-variant-numeric: tabular-nums">{{timerSummary}}</span>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: 0; border-radius: 20px; background: #FFD23F; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"></path></svg>Новая заявка</button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start">
+<sc-for list="{{columns}}" as="c" hint-placeholder-count="3">
+<section aria-label="{{c.name}}" style="background: #F6F6F4; border-radius: 14px; padding: 14px; min-height: 620px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0 0 4px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 5px; background: {{c.color}}"></span>{{c.name}}<span style="margin-left: auto; font-weight: 500; color: #5C5C58">{{c.count}}</span></h2>
+<sc-for list="{{c.cards}}" as="k" hint-placeholder-count="1">
+<article style="background: #FFFFFF; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); border: 1px solid {{k.border}}">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 12px; color: #5C5C58; font-variant-numeric: tabular-nums">№{{k.id}}</span>
+<span style="margin-left: auto; font-size: 12px; color: #1C1C1A; font-variant-numeric: tabular-nums">{{k.timer}}</span>
+<button type="button" onClick="{{k.play}}" aria-label="{{k.playLabel}}" style="width: 36px; height: 36px; border-radius: 18px; border: 1px solid {{k.playBorder}}; background: {{k.playBg}}; color: {{k.playFg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{k.isRunning}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2" width="10" height="10" rx="1.5"></rect></svg></sc-if>
+<sc-if value="{{k.notRunning}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><path d="M3.5 2.2v9.6a.6.6 0 0 0 .9.5l7.7-4.8a.6.6 0 0 0 0-1L4.4 1.7a.6.6 0 0 0-.9.5z"></path></svg></sc-if>
+</button>
+</div>
+<h3 style="margin: 0; font-size: 14px; font-weight: 500; line-height: 1.4">{{k.title}}</h3>
+<sc-if value="{{k.hasPlan}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #5C5C58"><span>Факт {{k.fact}} из {{k.plan}}</span><span>{{k.pctLabel}}</span></div>
+<div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{k.pct}}" aria-label="Часы от плана" style="height: 6px; border-radius: 3px; background: #ECECE8; overflow: hidden"><div style="height: 6px; width: {{k.pctLabel}}; background: {{k.barColor}}"></div></div>
+</div>
+</sc-if>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: #5C5C58">
+<span>Срок {{k.due}}</span>
+<sc-if value="{{k.canMove}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{k.move}}" style="margin-left: auto; min-height: 32px; padding: 0 10px; border: 0; border-radius: 16px; background: #EFEFEC; font-size: 12px">{{k.moveLabel}}</button>
+</sc-if>
+</div>
+</article>
+</sc-for>
+<sc-if value="{{c.empty}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 20px 8px; border: 1px dashed #CFCFCB; border-radius: 12px; font-size: 13px; color: #5C5C58; text-align: center">Перетащите сюда заявку</p>
+</sc-if>
+</section>
+</sc-for>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { col: { '3': 1, '4': 0, '5': 2 }, runId: '', startedAt: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => { if (this.state.runId) this.forceUpdate(); }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  data() {
+    return [
+      { id: '3', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Смена статусов и учет времени', plan: '8,00 ч', fact: '6,50 ч', pct: 81, due: '21.10.2026' },
+      { id: '4', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Диагностика нового обращения', plan: '', fact: '', pct: 0, due: '—' },
+      { id: '5', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Проверка исправления', plan: '', fact: '', pct: 0, due: '—' }
+    ];
+  }
+  renderVals() {
+    const st = this.state;
+    const cols = [
+      { name: 'Новая', color: '#1F5FBF' },
+      { name: 'В работе', color: '#A85A00' },
+      { name: 'На проверке', color: '#7B2CB8' }
+    ];
+    const s = st.runId ? Math.max(0, Math.floor((Date.now() - st.startedAt) / 1000)) : 0;
+    const clock = Math.floor(s / 3600) + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    const columns = cols.map((c, ci) => {
+      const cards = this.data()
+        .filter((t) => st.col[t.id] === ci)
+        .map((t) => {
+          const isRunning = t.id === st.runId;
+          return {
+            ...t,
+            isRunning,
+            notRunning: !isRunning,
+            timer: isRunning ? clock : '',
+            border: isRunning ? '#2A2A28' : 'transparent',
+            playLabel: isRunning ? 'Завершить работу по заявке №' + t.id : 'Начать работу по заявке №' + t.id,
+            playBg: isRunning ? '#2A2A28' : '#FFFFFF',
+            playFg: isRunning ? '#FFFFFF' : '#1C1C1A',
+            playBorder: isRunning ? '#2A2A28' : '#CFCFCB',
+            hasPlan: !!t.plan,
+            pctLabel: t.pct + '%',
+            barColor: t.pct >= 100 ? '#B42318' : '#A85A00',
+            canMove: ci < cols.length - 1,
+            moveLabel: ci < cols.length - 1 ? '→ ' + cols[ci + 1].name : '',
+            play: () => this.setState(isRunning ? { runId: '' } : { runId: t.id, startedAt: Date.now() }),
+            move: () => this.setState({ col: { ...this.state.col, [t.id]: Math.min(cols.length - 1, ci + 1) } })
+          };
+        });
+      return { ...c, cards, count: cards.length, empty: cards.length === 0 };
+    });
+    return {
+      columns,
+      timerSummary: st.runId ? 'Таймер: №' + st.runId + ' · ' + clock : 'Таймер не запущен'
+    };
+  }
+}
+</script>
+</body>
+</html>

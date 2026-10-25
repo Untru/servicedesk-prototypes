@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Кнопки В — действия в строке и полоса таймера</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>x-dc{display:none}</style>
+<script src="preact.min.js"></script>
+<script src="dc-lite.js"></script>
+</head>
+<body>
+<div style="font-family: Inter, system-ui, sans-serif; background: #1C1C1A; padding: 10px 16px"><a href="./" style="color: #FFFFFF; font-size: 14px; text-decoration: none">← Все прототипы</a></div>
+<div id="dc-root"></div>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEEC}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #1F5FBF;outline-offset:2px}
+a{color:#1F5FBF}a:hover{color:#16478F}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #1C1C1A; background: #EEEEEC; padding: 24px 16px; box-sizing: border-box; min-height: 780px">
+<div style="max-width: 1360px; margin: 0 auto; background: #FFFFFF; border-radius: 16px; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 600">Рабочее место сотрудника — Фокус на заявке</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">Обновить</button>
+<button type="button" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">Вид формы</button>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: 0; border-radius: 20px; background: {{accent}}; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"></path></svg>Новая заявка</button>
+</div>
+</div>
+
+<div role="status" aria-live="polite" style="min-height: 56px; box-sizing: border-box; border-radius: 12px; padding: 8px 8px 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: {{barBg}}; color: {{barFg}}">
+<sc-if value="{{running}}" hint-placeholder-val="{{false}}">
+<span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 5px; background: {{accent}}"></span>
+<span style="font-size: 14px; font-weight: 600">Идёт работа</span>
+<span style="flex: 1 1 240px; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">№{{run.id}} · {{run.title}}</span>
+<span style="font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 84px">{{elapsed}}</span>
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: #3D3D3A; color: #FFFFFF; font-size: 14px">Списать время</button>
+<button type="button" onClick="{{stop}}" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: {{accent}}; color: #1C1C1A; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2" width="10" height="10" rx="1.5"></rect></svg>Завершить</button>
+</sc-if>
+<sc-if value="{{idle}}" hint-placeholder-val="{{true}}">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="9" cy="9" r="7"></circle><path d="M9 5v4l2.5 2"></path></svg>
+<span style="font-size: 14px">Таймер не запущен — нажмите ▶ в строке заявки, чтобы начать работу</span>
+</sc-if>
+</div>
+
+<nav aria-label="Разделы рабочего места" style="display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid #E0E0DC">
+<button type="button" aria-current="page" style="min-height: 40px; padding: 0 12px; border: 0; border-bottom: 3px solid #FFC400; background: transparent; font-size: 14px; font-weight: 600">Заявки</button>
+<button type="button" style="min-height: 40px; padding: 0 12px; border: 0; background: transparent; font-size: 14px; color: #5C5C58">Активность</button>
+<button type="button" style="min-height: 40px; padding: 0 12px; border: 0; background: transparent; font-size: 14px; color: #5C5C58">Планировщик</button>
+<button type="button" style="min-height: 40px; padding: 0 12px; border: 0; background: transparent; font-size: 14px; color: #5C5C58">Канбан</button>
+</nav>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<section aria-label="Мои заявки" style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Мои заявки</h2>
+<div style="display: flex; gap: 8px; align-items: flex-end">
+<label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5C5C58">Номер<input type="text" style="min-height: 40px; border: 1px solid #CFCFCB; border-radius: 8px; padding: 0 12px; font: inherit; font-size: 14px; color: #1C1C1A"></label>
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #E6E6E3; font-size: 14px">Очистить</button>
+</div>
+<div style="overflow-x: auto">
+<div style="min-width: 420px; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 44px 100px minmax(0, 1fr) 92px; gap: 10px; align-items: center; min-height: 32px; padding: 0 10px 0 4px; font-size: 12px; color: #5C5C58; border-bottom: 1px solid #E0E0DC">
+<span></span><span>Номер</span><span>Содержание</span><span>Статус</span>
+</div>
+<sc-for list="{{tasks}}" as="t" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; padding-left: 4px; border-bottom: 1px solid #ECECE8; background: {{t.bg}}">
+<button type="button" onClick="{{t.play}}" aria-label="{{t.playLabel}}" style="width: 36px; height: 36px; border-radius: 18px; border: 1px solid {{t.playBorder}}; background: {{t.playBg}}; color: {{t.playFg}}; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{t.isRunning}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2" width="10" height="10" rx="1.5"></rect></svg></sc-if>
+<sc-if value="{{t.notRunning}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><path d="M3.5 2.2v9.6a.6.6 0 0 0 .9.5l7.7-4.8a.6.6 0 0 0 0-1L4.4 1.7a.6.6 0 0 0-.9.5z"></path></svg></sc-if>
+</button>
+<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.selected}}" style="display: grid; grid-template-columns: 100px minmax(0, 1fr) 92px; gap: 10px; align-items: center; min-height: 48px; padding: 0 10px 0 0; border: 0; background: transparent; text-align: left; font-size: 13px">
+<span style="font-variant-numeric: tabular-nums">{{t.num}}</span>
+<span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{t.title}}</span>
+<span style="color: {{t.color}}; font-weight: 500">{{t.status}}</span>
+</button>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section aria-label="Выбранная заявка" style="flex: 999 1 500px; min-width: 0; background: #F6F6F4; border-radius: 14px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">№{{sel.id}} · {{sel.title}}</h2>
+<span style="padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: {{sel.color}}; background: #FFFFFF; border: 1px solid {{sel.color}}">{{sel.status}}</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: #E6E6E3; font-size: 14px">Открыть заявку</button>
+<button type="button" style="min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px; background: #E6E6E3; font-size: 14px; display: flex; align-items: center; gap: 6px">Изменить статус<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg></button>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">План</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.plan}}</dd></div>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">Факт</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.fact}}</dd></div>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">Срок</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.due}}</dd></div>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">SLA</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.sla}}</dd></div>
+</dl>
+<a href="#" style="font-size: 14px; align-self: flex-start">Трудозатраты по заявке →</a>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 14px; font-size: 14px; line-height: 1.5; min-height: 120px">{{sel.descr}}</div>
+</section>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#FFD23F","options":["#FFD23F","#FFB648","#9CC3FF"]},"$preview":{"width":1280,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selId: '3', runId: '', startedAt: 0 };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => { if (this.state.runId) this.forceUpdate(); }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  data() {
+    return [
+      { id: '3', num: '00000000003', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Смена статусов и учет времени', status: 'В работе', color: '#A85A00', plan: '8,00 ч', fact: '6,50 ч', due: '21.10.2026 18:00', sla: 'Не рассчитано', descr: 'Учебная заявка для инструкции исполнителя.' },
+      { id: '4', num: '00000000004', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Диагностика нового обращения', status: 'Новая', color: '#1F5FBF', plan: '—', fact: '—', due: '—', sla: '—', descr: '[Описание заявки]' },
+      { id: '5', num: '00000000005', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Проверка исправления', status: 'На проверке', color: '#7B2CB8', plan: '—', fact: '—', due: '—', sla: '—', descr: '[Описание заявки]' }
+    ];
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#FFD23F';
+    const st = this.state;
+    const tasks = this.data().map((t) => {
+      const isRunning = t.id === st.runId;
+      return {
+        ...t,
+        isRunning,
+        notRunning: !isRunning,
+        selected: t.id === st.selId ? 'true' : 'false',
+        bg: t.id === st.selId ? '#FFF4CC' : 'transparent',
+        playLabel: isRunning ? 'Завершить работу по заявке №' + t.id : 'Начать работу по заявке №' + t.id,
+        playBg: isRunning ? '#2A2A28' : '#FFFFFF',
+        playFg: isRunning ? '#FFFFFF' : '#1C1C1A',
+        playBorder: isRunning ? '#2A2A28' : '#CFCFCB',
+        pick: () => this.setState({ selId: t.id }),
+        play: () => this.setState(isRunning ? { runId: '' } : { runId: t.id, startedAt: Date.now(), selId: t.id })
+      };
+    });
+    const sel = tasks.find((t) => t.id === st.selId);
+    const run = tasks.find((t) => t.id === st.runId) || tasks[0];
+    const s = st.runId ? Math.max(0, Math.floor((Date.now() - st.startedAt) / 1000)) : 0;
+    const elapsed = Math.floor(s / 3600) + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    return {
+      accent,
+      tasks,
+      sel,
+      run,
+      elapsed,
+      running: !!st.runId,
+      idle: !st.runId,
+      barBg: st.runId ? '#2A2A28' : '#F1F1EE',
+      barFg: st.runId ? '#FFFFFF' : '#4A4A46',
+      stop: () => this.setState({ runId: '' })
+    };
+  }
+}
+</script>
+</body>
+</html>

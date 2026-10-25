@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Прототип 5 — мой день: таймлайн</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>x-dc{display:none}</style>
+<script src="preact.min.js"></script>
+<script src="dc-lite.js"></script>
+</head>
+<body>
+<div style="font-family: Inter, system-ui, sans-serif; background: #1C1C1A; padding: 10px 16px"><a href="./" style="color: #FFFFFF; font-size: 14px; text-decoration: none">← Все прототипы</a></div>
+<div id="dc-root"></div>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEEC}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #1F5FBF;outline-offset:2px}
+a{color:#1F5FBF}a:hover{color:#16478F}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #1C1C1A; background: #EEEEEC; padding: 24px 16px; box-sizing: border-box; min-height: 800px">
+<div style="max-width: 1360px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 600">Мой день</h1>
+<span style="font-size: 14px; color: #5C5C58">25.10.2026</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">‹ Вчера</button>
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">Неделя</button>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+
+<section aria-label="Таймлайн дня" style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border-radius: 16px; padding: 18px; box-sizing: border-box">
+<p style="margin: 0 0 12px; font-size: 13px; color: #5C5C58">Нажмите на свободный час, чтобы списать время на этот интервал</p>
+<div style="position: relative">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="13">
+<button type="button" onClick="{{h.pick}}" aria-label="{{h.aria}}" style="width: 100%; height: 44px; display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: start; padding: 0; border: 0; border-top: 1px solid #ECECE8; background: {{h.bg}}; text-align: left">
+<span style="font-size: 12px; color: #5C5C58; padding-top: 4px; font-variant-numeric: tabular-nums">{{h.label}}</span>
+<span></span>
+</button>
+</sc-for>
+<sc-for list="{{blocks}}" as="b" hint-placeholder-count="1">
+<div style="position: absolute; left: 64px; right: 8px; top: {{b.top}}; height: {{b.height}}; border-radius: 8px; padding: 4px 10px; box-sizing: border-box; overflow: hidden; font-size: 12px; font-weight: 600; background: {{b.bg}}; color: {{b.fg}}; border: 1px solid {{b.border}}">{{b.label}}</div>
+</sc-for>
+<div aria-hidden="true" style="position: absolute; left: 56px; right: 0; top: {{nowTop}}; height: 2px; background: #B42318"></div>
+</div>
+</section>
+
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<section aria-label="Списать время" style="background: #FFFFFF; border-radius: 16px; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Списать время</h2>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5C5C58">Заявка
+<select onChange="{{pickTask}}" style="min-height: 40px; border: 1px solid #CFCFCB; border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; color: #1C1C1A; background: #FFFFFF">
+<option value="3">№3 · Смена статусов и учет времени</option>
+<option value="4">№4 · Диагностика нового обращения</option>
+<option value="5">№5 · Проверка исправления</option>
+</select>
+</label>
+<div style="display: flex; justify-content: space-between; align-items: center; background: #F6F6F4; border-radius: 10px; padding: 10px 12px; font-size: 14px">
+<span>Интервал</span><span style="font-weight: 600; font-variant-numeric: tabular-nums">{{formRange}}</span>
+</div>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5C5C58">Что сделано
+<textarea rows="3" style="border: 1px solid #CFCFCB; border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 14px; color: #1C1C1A; resize: vertical"></textarea>
+</label>
+<button type="button" onClick="{{log}}" disabled="{{noSlot}}" style="min-height: 44px; border: 0; border-radius: 22px; background: #FFD23F; font-size: 14px; font-weight: 600">Списать</button>
+</section>
+
+<section aria-label="Остаток по плану" style="background: #FFFFFF; border-radius: 16px; padding: 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Остаток по плану</h2>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span>№3 · Смена статусов…</span><span style="font-weight: 600">1,50 ч из 8,00</span></div>
+<div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="81" aria-label="Израсходовано по №3" style="height: 6px; border-radius: 3px; background: #ECECE8; overflow: hidden"><div style="height: 6px; width: 81%; background: #A85A00"></div></div>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; color: #5C5C58"><span>№4 · Диагностика…</span><span>план не задан</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; color: #5C5C58"><span>№5 · Проверка исправления</span><span>план не задан</span></div>
+</section>
+
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { slot: null, taskId: '3', logged: [] };
+  }
+  renderVals() {
+    const st = this.state;
+    const ROW = 44;
+    const START = 8;
+    const fmt = (h) => String(h).padStart(2, '0') + ':00';
+    const hours = [];
+    for (let h = START; h <= 20; h++) {
+      hours.push({
+        label: fmt(h),
+        aria: 'Списать время с ' + fmt(h) + ' до ' + fmt(h + 1),
+        bg: st.slot === h ? '#FFF4CC' : 'transparent',
+        pick: () => this.setState({ slot: h })
+      });
+    }
+    const timerStart = 18 + 31 / 60;
+    const blocks = [
+      { label: '№3 · таймер с 18:31 · идёт', top: ((timerStart - START) * ROW) + 'px', height: '40px', bg: '#2A2A28', fg: '#FFFFFF', border: '#2A2A28' }
+    ].concat(st.logged.map((l) => ({
+      label: '№' + l.taskId + ' · ' + fmt(l.h) + '–' + fmt(l.h + 1) + ' · списано',
+      top: ((l.h - START) * ROW + 2) + 'px',
+      height: (ROW - 4) + 'px',
+      bg: '#FFF1C2',
+      fg: '#1C1C1A',
+      border: '#E0A800'
+    })));
+    return {
+      hours,
+      blocks,
+      nowTop: ((timerStart + 0.6 - START) * ROW) + 'px',
+      formRange: st.slot === null ? 'выберите час слева' : fmt(st.slot) + ' — ' + fmt(st.slot + 1) + ' · 1,00 ч',
+      noSlot: st.slot === null,
+      pickTask: (e) => this.setState({ taskId: e.target.value }),
+      log: () => {
+        if (this.state.slot === null) return;
+        this.setState({ logged: this.state.logged.concat([{ h: this.state.slot, taskId: this.state.taskId }]), slot: null });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

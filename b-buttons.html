@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Кнопки Б — главная кнопка и меню «Ещё»</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>x-dc{display:none}</style>
+<script src="preact.min.js"></script>
+<script src="dc-lite.js"></script>
+</head>
+<body>
+<div style="font-family: Inter, system-ui, sans-serif; background: #1C1C1A; padding: 10px 16px"><a href="./" style="color: #FFFFFF; font-size: 14px; text-decoration: none">← Все прототипы</a></div>
+<div id="dc-root"></div>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEEC}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #1F5FBF;outline-offset:2px}
+a{color:#1C1C1A}a:hover{color:#1F5FBF}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #1C1C1A; background: #EEEEEC; padding: 24px 16px; box-sizing: border-box; min-height: 780px">
+<div style="max-width: 1360px; margin: 0 auto; background: #FFFFFF; border-radius: 16px; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 600">Рабочее место сотрудника — Фокус на заявке</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">Обновить</button>
+<button type="button" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">Вид формы</button>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: 0; border-radius: 20px; background: {{accent}}; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"></path></svg>Новая заявка</button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px">
+<div style="background: #F1F5FC; border-radius: 12px; padding: 14px 16px; display: flex; align-items: baseline; gap: 10px"><span style="font-size: 20px; font-weight: 700; color: #1F5FBF">3</span><span style="font-size: 14px">Активные заявки</span></div>
+<div style="background: #F1F5FC; border-radius: 12px; padding: 14px 16px; display: flex; align-items: baseline; gap: 10px"><span style="font-size: 20px; font-weight: 700; color: #1F5FBF">0</span><span style="font-size: 14px">Просрочено</span></div>
+<div style="background: #F1F5FC; border-radius: 12px; padding: 14px 16px; display: flex; align-items: baseline; gap: 10px"><span style="font-size: 20px; font-weight: 700; color: #1F5FBF">0</span><span style="font-size: 14px">В зоне риска</span></div>
+<div style="background: #F1F5FC; border-radius: 12px; padding: 14px 16px; display: flex; align-items: baseline; gap: 10px"><span style="font-size: 20px; font-weight: 700; color: #1F5FBF">1</span><span style="font-size: 14px">Ждут клиента</span></div>
+</div>
+
+<nav aria-label="Разделы рабочего места" style="display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid #E0E0DC">
+<button type="button" aria-current="page" style="min-height: 40px; padding: 0 12px; border: 0; border-bottom: 3px solid #FFC400; background: transparent; font-size: 14px; font-weight: 600">Заявки</button>
+<button type="button" style="min-height: 40px; padding: 0 12px; border: 0; background: transparent; font-size: 14px; color: #5C5C58">Активность</button>
+<button type="button" style="min-height: 40px; padding: 0 12px; border: 0; background: transparent; font-size: 14px; color: #5C5C58">Планировщик</button>
+<button type="button" style="min-height: 40px; padding: 0 12px; border: 0; background: transparent; font-size: 14px; color: #5C5C58">Канбан</button>
+</nav>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<section aria-label="Мои заявки" style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Мои заявки</h2>
+<div style="display: flex; gap: 8px; align-items: flex-end">
+<label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5C5C58">Номер<input type="text" style="min-height: 40px; border: 1px solid #CFCFCB; border-radius: 8px; padding: 0 12px; font: inherit; font-size: 14px; color: #1C1C1A"></label>
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: #E6E6E3; font-size: 14px">Очистить</button>
+</div>
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{tasks}}" as="t" hint-placeholder-count="3">
+<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.selected}}" style="display: grid; grid-template-columns: 12px 108px minmax(0, 1fr) 92px; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px; border: 0; border-bottom: 1px solid #ECECE8; background: {{t.bg}}; text-align: left; font-size: 13px">
+<span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 4px; background: {{t.color}}"></span>
+<span style="font-variant-numeric: tabular-nums">{{t.num}}</span>
+<span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{t.title}}</span>
+<span style="color: {{t.color}}; font-weight: 500">{{t.status}}</span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Выбранная заявка" style="flex: 999 1 560px; min-width: 0; background: #F6F6F4; border-radius: 14px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px">
+<div style="flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600; line-height: 1.35"><a href="#" style="text-decoration: none; display: inline-flex; gap: 6px; align-items: baseline">№{{sel.id}} · {{sel.title}}<svg aria-hidden="true" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2.5h6.5V9M11.5 2.5 3 11"></path></svg></a></h2>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #5C5C58">
+<span style="padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: {{sel.color}}; background: #FFFFFF; border: 1px solid {{sel.color}}">{{sel.status}}</span>
+<span style="font-variant-numeric: tabular-nums; min-width: 230px">{{timerLine}}</span>
+</div>
+</div>
+
+<div style="position: relative; display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<button type="button" onClick="{{toggle}}" style="width: 220px; min-height: 48px; border: 0; border-radius: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; background: {{toggleBg}}; color: {{toggleFg}}">
+<sc-if value="{{running}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2" width="10" height="10" rx="1.5"></rect></svg>Завершить · {{elapsed}}</sc-if>
+<sc-if value="{{idle}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M3.5 2.2v9.6a.6.6 0 0 0 .9.5l7.7-4.8a.6.6 0 0 0 0-1L4.4 1.7a.6.6 0 0 0-.9.5z"></path></svg>Начать работу</sc-if>
+</button>
+<button type="button" onClick="{{toggleStatus}}" aria-expanded="{{statusOpenAttr}}" style="min-height: 48px; padding: 0 16px; border: 0; border-radius: 24px; background: #E6E6E3; font-size: 14px; display: flex; align-items: center; gap: 6px">Изменить статус<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg></button>
+<button type="button" onClick="{{toggleMore}}" aria-expanded="{{moreOpenAttr}}" aria-label="Ещё действия" style="width: 48px; min-height: 48px; border: 0; border-radius: 24px; background: #E6E6E3; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><circle cx="4" cy="9" r="1.6"></circle><circle cx="9" cy="9" r="1.6"></circle><circle cx="14" cy="9" r="1.6"></circle></svg></button>
+
+<sc-if value="{{statusOpen}}" hint-placeholder-val="{{false}}">
+<div role="menu" aria-label="Перевести в статус" style="position: absolute; top: 56px; right: 56px; z-index: 10; width: 240px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); padding: 6px; display: flex; flex-direction: column">
+<sc-for list="{{statusItems}}" as="s" hint-placeholder-count="4">
+<button type="button" role="menuitemradio" aria-checked="{{s.checked}}" onClick="{{s.pick}}" style="min-height: 40px; padding: 0 12px; border: 0; border-radius: 8px; background: {{s.bg}}; text-align: left; font-size: 14px; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 4px; background: {{s.color}}"></span>{{s.name}}</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{moreOpen}}" hint-placeholder-val="{{false}}">
+<div role="menu" aria-label="Ещё действия" style="position: absolute; top: 56px; right: 0; z-index: 10; width: 240px; background: #FFFFFF; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); padding: 6px; display: flex; flex-direction: column">
+<button type="button" role="menuitem" style="min-height: 40px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; text-align: left; font-size: 14px">Открыть заявку</button>
+<div aria-hidden="true" style="height: 1px; background: #ECECE8; margin: 4px 6px"></div>
+<button type="button" role="menuitem" style="min-height: 40px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; text-align: left; font-size: 14px">Списать время…</button>
+<button type="button" role="menuitem" style="min-height: 40px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; text-align: left; font-size: 14px">Трудозатраты</button>
+</div>
+</sc-if>
+</div>
+</div>
+
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">План</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.plan}}</dd></div>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">Факт</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.fact}}</dd></div>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">Срок</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.due}}</dd></div>
+<div style="background: #FFFFFF; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">SLA</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.sla}}</dd></div>
+</dl>
+
+<div style="background: #FFFFFF; border-radius: 10px; padding: 14px; font-size: 14px; line-height: 1.5; min-height: 140px">{{sel.descr}}</div>
+</section>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#FFD23F","options":["#FFD23F","#FFB648","#9CC3FF"]},"$preview":{"width":1280,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { selId: '3', running: false, startedAt: 0, startClock: '', runId: '', moreOpen: false, statusOpen: false, statusById: {} };
+  }
+  componentDidMount() {
+    this.tick = setInterval(() => { if (this.state.running) this.forceUpdate(); }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  statuses() {
+    return [
+      { name: 'Новая', color: '#1F5FBF' },
+      { name: 'В работе', color: '#A85A00' },
+      { name: 'Ждёт клиента', color: '#0F766E' },
+      { name: 'На проверке', color: '#7B2CB8' }
+    ];
+  }
+  data() {
+    return [
+      { id: '3', num: '00000000003', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Смена статусов и учет времени', status: 'В работе', plan: '8,00 ч', fact: '6,50 ч', due: '21.10.2026 18:00', sla: 'Не рассчитано', descr: 'Учебная заявка для инструкции исполнителя.' },
+      { id: '4', num: '00000000004', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Диагностика нового обращения', status: 'Новая', plan: '—', fact: '—', due: '—', sla: '—', descr: '[Описание заявки]' },
+      { id: '5', num: '00000000005', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Проверка исправления', status: 'На проверке', plan: '—', fact: '—', due: '—', sla: '—', descr: '[Описание заявки]' }
+    ];
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#FFD23F';
+    const st = this.state;
+    const colorOf = (name) => (this.statuses().find((x) => x.name === name) || { color: '#5C5C58' }).color;
+    const tasks = this.data().map((t) => {
+      const status = st.statusById[t.id] || t.status;
+      return {
+        ...t,
+        status,
+        color: colorOf(status),
+        selected: t.id === st.selId ? 'true' : 'false',
+        bg: t.id === st.selId ? '#FFF4CC' : 'transparent',
+        pick: () => this.setState({ selId: t.id, moreOpen: false, statusOpen: false })
+      };
+    });
+    const sel = tasks.find((t) => t.id === st.selId);
+    const statusItems = this.statuses().map((x) => ({
+      ...x,
+      checked: x.name === sel.status ? 'true' : 'false',
+      bg: x.name === sel.status ? '#F1F1EE' : 'transparent',
+      pick: () => this.setState({ statusById: { ...this.state.statusById, [sel.id]: x.name }, statusOpen: false })
+    }));
+    const s = st.running ? Math.max(0, Math.floor((Date.now() - st.startedAt) / 1000)) : 0;
+    const elapsed = Math.floor(s / 3600) + ':' + String(Math.floor(s / 60) % 60).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    return {
+      accent,
+      tasks,
+      sel,
+      statusItems,
+      running: st.running,
+      idle: !st.running,
+      elapsed,
+      moreOpen: st.moreOpen,
+      statusOpen: st.statusOpen,
+      moreOpenAttr: st.moreOpen ? 'true' : 'false',
+      statusOpenAttr: st.statusOpen ? 'true' : 'false',
+      toggleBg: st.running ? '#2A2A28' : accent,
+      toggleFg: st.running ? '#FFFFFF' : '#1C1C1A',
+      timerLine: st.running ? 'Таймер с ' + st.startClock + ' · заявка №' + st.runId : 'Таймер не запущен',
+      toggleMore: () => this.setState({ moreOpen: !this.state.moreOpen, statusOpen: false }),
+      toggleStatus: () => this.setState({ statusOpen: !this.state.statusOpen, moreOpen: false }),
+      toggle: () => {
+        if (this.state.running) {
+          this.setState({ running: false });
+        } else {
+          this.setState({ running: true, startedAt: Date.now(), startClock: new Date().toTimeString().slice(0, 5), runId: this.state.selId });
+        }
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

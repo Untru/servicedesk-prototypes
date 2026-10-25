@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Прототип 1 — KPI-фильтры и вкладки карточки</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>x-dc{display:none}</style>
+<script src="preact.min.js"></script>
+<script src="dc-lite.js"></script>
+</head>
+<body>
+<div style="font-family: Inter, system-ui, sans-serif; background: #1C1C1A; padding: 10px 16px"><a href="./" style="color: #FFFFFF; font-size: 14px; text-decoration: none">← Все прототипы</a></div>
+<div id="dc-root"></div>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EEEEEC}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #1F5FBF;outline-offset:2px}
+a{color:#1F5FBF}a:hover{color:#16478F}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #1C1C1A; background: #EEEEEC; padding: 24px 16px; box-sizing: border-box; min-height: 800px">
+<div style="max-width: 1360px; margin: 0 auto; background: #FFFFFF; border-radius: 16px; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 600">Мои заявки</h1>
+<span style="padding: 4px 10px; border-radius: 12px; background: #F1F1EE; font-size: 13px; color: #4A4A46">Просрочено 0</span>
+<span style="padding: 4px 10px; border-radius: 12px; background: #F1F1EE; font-size: 13px; color: #4A4A46">В зоне риска 0</span>
+<span style="padding: 4px 10px; border-radius: 12px; background: #E6F4F1; font-size: 13px; color: #0F5F58; font-weight: 600">Ждут клиента 1</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: #E6E6E3; font-size: 14px">Обновить</button>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: 0; border-radius: 20px; background: #FFD23F; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3v10M3 8h10"></path></svg>Новая заявка</button>
+</div>
+</div>
+
+<div role="group" aria-label="Отбор по статусу" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+<button type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="min-height: 64px; border-radius: 12px; padding: 12px 16px; display: flex; align-items: baseline; gap: 10px; text-align: left; border: 2px solid {{f.border}}; background: {{f.bg}}">
+<span style="font-size: 24px; font-weight: 700; color: {{f.color}}; font-variant-numeric: tabular-nums">{{f.count}}</span>
+<span style="font-size: 14px">{{f.label}}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+<section aria-label="Список заявок" style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #5C5C58">Поиск по номеру или теме<input type="search" style="min-height: 40px; border: 1px solid #CFCFCB; border-radius: 8px; padding: 0 12px; font: inherit; font-size: 14px; color: #1C1C1A"></label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{visible}}" as="t" hint-placeholder-count="3">
+<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.selected}}" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; border: 1px solid {{t.border}}; background: {{t.bg}}; text-align: left">
+<span style="display: flex; justify-content: space-between; gap: 8px; font-size: 12px"><span style="color: #5C5C58; font-variant-numeric: tabular-nums">№{{t.id}}</span><span style="color: {{t.color}}; font-weight: 600">{{t.status}}</span></span>
+<span style="font-size: 14px; font-weight: 500; line-height: 1.35">{{t.title}}</span>
+</button>
+</sc-for>
+<sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 24px; border-radius: 12px; background: #F6F6F4; font-size: 14px; color: #5C5C58; text-align: center">В этом отборе заявок нет</p>
+</sc-if>
+</div>
+</section>
+
+<section aria-label="Карточка заявки" style="flex: 999 1 560px; min-width: 0; border: 1px solid #E0E0DC; border-radius: 14px; box-sizing: border-box; display: flex; flex-direction: column">
+<div style="padding: 18px 20px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600; flex: 1 1 280px; min-width: 0">№{{sel.id}} · {{sel.title}}</h2>
+<span style="padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: {{sel.color}}; border: 1px solid {{sel.color}}">{{sel.status}}</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<button type="button" onClick="{{toggle}}" style="width: 176px; min-height: 44px; border: 0; border-radius: 22px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; background: {{toggleBg}}; color: {{toggleFg}}">
+<sc-if value="{{running}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2" width="10" height="10" rx="1.5"></rect></svg>Завершить</sc-if>
+<sc-if value="{{idle}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 14 14" fill="currentColor"><path d="M3.5 2.2v9.6a.6.6 0 0 0 .9.5l7.7-4.8a.6.6 0 0 0 0-1L4.4 1.7a.6.6 0 0 0-.9.5z"></path></svg>Начать</sc-if>
+</button>
+<button type="button" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: #E6E6E3; font-size: 14px">Изменить статус</button>
+<span aria-hidden="true" style="width: 1px; height: 28px; background: #E0E0DC"></span>
+<button type="button" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: #E6E6E3; font-size: 14px">Списать время</button>
+<button type="button" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: transparent; font-size: 14px; color: #1F5FBF">Открыть заявку ↗</button>
+</div>
+<div role="tablist" aria-label="Разделы карточки" style="display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid #E0E0DC">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4">
+<button type="button" role="tab" aria-selected="{{tb.selected}}" onClick="{{tb.pick}}" style="min-height: 40px; padding: 0 12px; border: 0; border-bottom: 3px solid {{tb.line}}; background: transparent; font-size: 14px; font-weight: {{tb.weight}}; color: {{tb.color}}">{{tb.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div role="tabpanel" style="padding: 18px 20px 20px; min-height: 260px; display: flex; flex-direction: column; gap: 14px">
+<sc-if value="{{tabDescr}}" hint-placeholder-val="{{true}}">
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+<div><dt style="font-size: 12px; color: #5C5C58">Срок</dt><dd style="margin: 4px 0 0; font-size: 15px; font-weight: 600">{{sel.due}}</dd></div>
+<div><dt style="font-size: 12px; color: #5C5C58">SLA</dt><dd style="margin: 4px 0 0; font-size: 15px; font-weight: 600">{{sel.sla}}</dd></div>
+<div><dt style="font-size: 12px; color: #5C5C58">План / факт</dt><dd style="margin: 4px 0 0; font-size: 15px; font-weight: 600">{{sel.plan}} / {{sel.fact}}</dd></div>
+</dl>
+<div style="background: #F6F6F4; border-radius: 10px; padding: 14px; font-size: 14px; line-height: 1.5; min-height: 100px">{{sel.descr}}</div>
+</sc-if>
+<sc-if value="{{tabHours}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Факт {{sel.fact}} из плана {{sel.plan}}</span><span style="font-weight: 600">{{sel.pctLabel}}</span></div>
+<div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{sel.pct}}" aria-label="Израсходовано часов от плана" style="height: 10px; border-radius: 5px; background: #ECECE8; overflow: hidden"><div style="height: 10px; width: {{sel.pctLabel}}; background: #A85A00"></div></div>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+<div style="background: #F6F6F4; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">Моя ставка</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.rate}}</dd></div>
+<div style="background: #F6F6F4; border-radius: 10px; padding: 12px 14px"><dt style="font-size: 12px; color: #5C5C58">Мне начислено</dt><dd style="margin: 4px 0 0; font-size: 16px; font-weight: 600">{{sel.earned}}</dd></div>
+</dl>
+</sc-if>
+<sc-if value="{{tabHistory}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; font-size: 14px; color: #5C5C58">[Лента: смена статусов, комментарии, списания времени — по времени, новые сверху]</p>
+</sc-if>
+<sc-if value="{{tabFiles}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; font-size: 14px; color: #5C5C58">[Файлы заявки с перетаскиванием для загрузки]</p>
+</sc-if>
+</div>
+</section>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'all', selId: '3', tab: 'descr', running: false };
+  }
+  data() {
+    return [
+      { id: '3', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Смена статусов и учет времени', status: 'В работе', key: 'work', color: '#A85A00', plan: '8,00 ч', fact: '6,50 ч', pct: 81, due: '21.10.2026 18:00', sla: 'Не рассчитано', rate: '1 500 ₽/ч', earned: '9 750 ₽', descr: 'Учебная заявка для инструкции исполнителя.' },
+      { id: '4', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Диагностика нового обращения', status: 'Новая', key: 'new', color: '#1F5FBF', plan: '—', fact: '—', pct: 0, due: '—', sla: '—', rate: '—', earned: '—', descr: '[Описание заявки]' },
+      { id: '5', title: 'ИНСТРУКЦИЯ ИСПОЛНИТЕЛЯ — Проверка исправления', status: 'На проверке', key: 'check', color: '#7B2CB8', plan: '—', fact: '—', pct: 0, due: '—', sla: '—', rate: '—', earned: '—', descr: '[Описание заявки]' }
+    ];
+  }
+  renderVals() {
+    const st = this.state;
+    const all = this.data();
+    const defs = [
+      { key: 'all', label: 'Все активные', color: '#1C1C1A' },
+      { key: 'new', label: 'Новые', color: '#1F5FBF' },
+      { key: 'work', label: 'В работе', color: '#A85A00' },
+      { key: 'check', label: 'На проверке', color: '#7B2CB8' }
+    ];
+    const filters = defs.map((f) => {
+      const on = f.key === st.filter;
+      return {
+        ...f,
+        count: f.key === 'all' ? all.length : all.filter((t) => t.key === f.key).length,
+        pressed: on ? 'true' : 'false',
+        bg: on ? '#FFF4CC' : '#F6F6F4',
+        border: on ? '#E0A800' : 'transparent',
+        pick: () => this.setState({ filter: f.key })
+      };
+    });
+    const visible = all
+      .filter((t) => st.filter === 'all' || t.key === st.filter)
+      .map((t) => ({
+        ...t,
+        selected: t.id === st.selId ? 'true' : 'false',
+        bg: t.id === st.selId ? '#FFF4CC' : '#FFFFFF',
+        border: t.id === st.selId ? '#E0A800' : '#E0E0DC',
+        pick: () => this.setState({ selId: t.id })
+      }));
+    const base = all.find((t) => t.id === st.selId);
+    const sel = { ...base, pctLabel: base.pct + '%' };
+    const tabDefs = [
+      { key: 'descr', label: 'Описание' },
+      { key: 'hours', label: 'Часы' },
+      { key: 'history', label: 'История' },
+      { key: 'files', label: 'Файлы' }
+    ];
+    const tabs = tabDefs.map((tb) => {
+      const on = tb.key === st.tab;
+      return {
+        ...tb,
+        selected: on ? 'true' : 'false',
+        line: on ? '#FFC400' : 'transparent',
+        weight: on ? '600' : '400',
+        color: on ? '#1C1C1A' : '#5C5C58',
+        pick: () => this.setState({ tab: tb.key })
+      };
+    });
+    return {
+      filters,
+      visible,
+      empty: visible.length === 0,
+      sel,
+      tabs,
+      tabDescr: st.tab === 'descr',
+      tabHours: st.tab === 'hours',
+      tabHistory: st.tab === 'history',
+      tabFiles: st.tab === 'files',
+      running: st.running,
+      idle: !st.running,
+      toggleBg: st.running ? '#2A2A28' : '#FFD23F',
+      toggleFg: st.running ? '#FFFFFF' : '#1C1C1A',
+      toggle: () => this.setState({ running: !this.state.running })
+    };
+  }
+}
+</script>
+</body>
+</html>
