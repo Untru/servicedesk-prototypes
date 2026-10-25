@@ -4,12 +4,23 @@
 <meta charset="utf-8">
 <title>Прототип 1 — KPI-фильтры и вкладки карточки</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>x-dc{display:none}</style>
+<style>
+x-dc{display:none}
+.pnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1C1C1A;font-family:Inter,system-ui,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.pnav a{color:#FFFFFF;text-decoration:none;font-size:14px;white-space:nowrap;border-radius:20px;display:inline-flex;align-items:center;min-height:40px;padding:0 14px}
+.pnav a:hover{background:#3D3D3A}
+.pnav a:focus-visible{outline:2px solid #FFD23F;outline-offset:2px}
+.pnav a[aria-current=page]{background:#FFD23F;color:#1C1C1A;font-weight:600}
+.pnav .tabs{flex:1;min-width:0;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:thin}
+.pnav .sep{flex:none;width:1px;height:24px;background:#5C5C58;margin:0 6px}
+.pnav .key{font-weight:700;margin-right:6px}
+.pnav .arrow{flex:none;width:40px;justify-content:center;padding:0;font-size:20px;background:#2E2E2B}
+</style>
 <script src="preact.min.js"></script>
 <script src="dc-lite.js"></script>
 </head>
 <body>
-<div style="font-family: Inter, system-ui, sans-serif; background: #1C1C1A; padding: 10px 16px"><a href="./" style="color: #FFFFFF; font-size: 14px; text-decoration: none">← Все прототипы</a></div>
+<nav class="pnav" aria-label="Прототипы"><a href="./" aria-label="Все прототипы">☰ Все</a><a class="arrow" href="c-buttons.html" aria-label="Предыдущий прототип">‹</a><div class="tabs"><a href="a-buttons.html"><span class="key">А</span>Панель действий</a><a href="b-buttons.html"><span class="key">Б</span>Меню «Ещё»</a><a href="c-buttons.html"><span class="key">В</span>Действия в строке</a><span class="sep" aria-hidden="true"></span><a href="p1-filters.html" aria-current="page"><span class="key">1</span>Фильтры и вкладки</a><a href="p2-focus.html"><span class="key">2</span>Очередь</a><a href="p3-kanban.html"><span class="key">3</span>Канбан</a><a href="p4-sheet.html"><span class="key">4</span>Боковая карточка</a><a href="p5-day.html"><span class="key">5</span>Мой день</a></div><a class="arrow" href="p2-focus.html" aria-label="Следующий прототип">›</a></nav>
 <div id="dc-root"></div>
 <x-dc>
 <helmet>

@@ -90,6 +90,8 @@
   };
 
   function start() {
+    var current = document.querySelector('.pnav [aria-current="page"]');
+    if (current) current.scrollIntoView({ inline: 'center', block: 'nearest' });
     fetch(location.href)
       .then(function (r) { return r.text(); })
       .then(function (source) {
