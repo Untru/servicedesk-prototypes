@@ -3,17 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Рабочее место сотрудника — прототипы</title>
+<title>ServiceDesk — прототипы</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0;background:#EEEEEC;color:#1C1C1A;font-family:Inter,system-ui,sans-serif}
 main{max-width:1120px;margin:0 auto;padding:32px 16px 48px}
 h1{margin:0 0 8px;font-size:28px;font-weight:700}
-.lead{margin:0 0 32px;font-size:16px;line-height:1.5;color:#4A4A46;max-width:720px}
-h2{margin:32px 0 12px;font-size:18px;font-weight:600}
+.lead{margin:0 0 12px;font-size:16px;line-height:1.5;color:#4A4A46;max-width:760px}
+h2{margin:36px 0 4px;font-size:20px;font-weight:600}
+.sub{margin:0 0 14px;font-size:14px;color:#5C5C58;max-width:760px;line-height:1.45}
+h3{margin:22px 0 10px;font-size:15px;font-weight:600;color:#4A4A46}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 a.card{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:14px;background:#FFFFFF;color:inherit;text-decoration:none;border:2px solid transparent}
 a.card:hover,a.card:focus-visible{border-color:#E0A800;outline:none}
+a.card.plan{background:#FFF7D5}
 .tag{font-size:12px;font-weight:600;color:#7A5A00;text-transform:uppercase;letter-spacing:.06em}
 .name{font-size:16px;font-weight:600}
 .desc{font-size:14px;line-height:1.45;color:#4A4A46}
@@ -21,24 +24,51 @@ footer{margin-top:40px;font-size:13px;color:#5C5C58}
 </style>
 </head>
 <body>
+<nav id="pnav" class="pnav" aria-label="Прототипы"></nav>
+<script src="nav.js"></script>
 <main>
-<h1>Рабочее место сотрудника</h1>
-<p class="lead">Прототипы ServiceDesk на 1С: где разместить кнопки работы с заявкой и как перестроить экран исполнителя. Все экраны интерактивные — можно нажимать «Начать», выбирать заявки и переключать вкладки. Данные взяты из учебной базы.</p>
+<h1>ServiceDesk — прототипы</h1>
+<p class="lead">Интерактивные прототипы для 1С ServiceDesk: можно нажимать кнопки, выбирать фильтры и переключать вкладки. Вверху каждой страницы — переключение между прототипами. Данные вымышленные.</p>
 
-<h2>3 варианта кнопок</h2>
+<h2>Фильтры и сортировка заявок</h2>
+<p class="sub">«Мои / Все заявки», фильтры по спискам статусов, клиентов и исполнителей, четыре сортировки и пагинация, при которой поиск и фильтры работают по всем страницам. В каждом прототипе ~1 340 заявок.</p>
 <div class="grid">
-<a class="card" href="a-buttons.html"><span class="tag">Вариант А</span><span class="name">Единая панель действий</span><span class="desc">Подгруппы «Работа / Заявка / Время»; «Начать» превращается в «Завершить» на том же месте и не сдвигает соседние кнопки.</span></a>
-<a class="card" href="b-buttons.html"><span class="tag">Вариант Б</span><span class="name">Главная кнопка и меню «Ещё»</span><span class="desc">Одна главная кнопка, «Изменить статус» со списком статусов, остальное — в меню; заголовок заявки открывает её.</span></a>
-<a class="card" href="c-buttons.html"><span class="tag">Вариант В</span><span class="name">Действия в строке и полоса таймера</span><span class="desc">▶ прямо в строке списка, а над списком полоса «Идёт работа» с таймером и кнопкой «Завершить».</span></a>
+<a class="card" href="f1-chips.html"><span class="tag">Ф1</span><span class="name">Фильтры-чипсы</span><span class="desc">Ряд чипсов «Статус ▾ Клиент ▾ Исполнитель ▾» с чек-листами над очередью, меню сортировки, номера страниц.</span></a>
+<a class="card" href="f2-facets.html"><span class="tag">Ф2</span><span class="name">Фасеты слева</span><span class="desc">Панель фасетов со счётчиками, таблица с сортировкой по клику на заголовок колонки.</span></a>
+<a class="card" href="f3-query.html"><span class="tag">Ф3</span><span class="name">Строка запроса и виды</span><span class="desc">Сохранённые виды вкладками, умная строка с токенами «статус:», «клиент:», подгрузка «Показать ещё».</span></a>
+<a class="card plan" href="plan.html"><span class="tag">План</span><span class="name">Большие объёмы данных</span><span class="desc">Ключевая пагинация, двухшаговый запрос, поиск по номеру и полнотекстовый, счётчики с кэшем, индексы и этапы работ.</span></a>
 </div>
 
-<h2>5 прототипов экрана</h2>
+<h2>Форма заявки</h2>
+<p class="sub">Сейчас на форме 9 вкладок и ~15 полей в паспорте — «глаза разбегаются». Десять вариантов спокойной формы «как рабочее место»: одна главная кнопка действия, второстепенное спрятано. «Начать работу» превращается в чёрную «Завершить работу».</p>
+<h3>На возможностях управляемых форм</h3>
 <div class="grid">
-<a class="card" href="p1-filters.html"><span class="tag">Прототип 1</span><span class="name">Плитки-фильтры и вкладки карточки</span><span class="desc">Плитки со счётчиками отбирают список; в карточке заявки вкладки «Описание / Часы / История / Файлы».</span></a>
-<a class="card" href="p2-focus.html"><span class="tag">Прототип 2</span><span class="name">Очередь: одна заявка за раз</span><span class="desc">Крупная карточка текущей заявки, «Предыдущая / Следующая», главная кнопка всегда в одном месте.</span></a>
-<a class="card" href="p3-kanban.html"><span class="tag">Прототип 3</span><span class="name">Канбан с прогрессом часов</span><span class="desc">Колонки по статусам, полоса «факт из плана», запуск таймера и перевод в следующий статус прямо с карточки.</span></a>
-<a class="card" href="p4-sheet.html"><span class="tag">Прототип 4</span><span class="name">Боковая карточка над списком</span><span class="desc">Широкая таблица остаётся на месте, карточка заявки выезжает справа поверх неё.</span></a>
-<a class="card" href="p5-day.html"><span class="tag">Прототип 5</span><span class="name">Мой день: таймлайн</span><span class="desc">Шкала дня с текущим таймером; клик по свободному часу сразу заполняет форму списания времени.</span></a>
+<a class="card" href="m1-two-columns.html"><span class="tag">У1</span><span class="name">Две колонки</span><span class="desc">Описание слева, компактный паспорт из шести полей справа, остальное — в свёрнутой группе «Подробнее».</span></a>
+<a class="card" href="m2-tabs.html"><span class="tag">У2</span><span class="name">Вкладки по делу</span><span class="desc">Четыре вкладки вместо девяти: «Суть», «Работа», «Обсуждение», «Ещё».</span></a>
+<a class="card" href="m3-status-bar.html"><span class="tag">У3</span><span class="name">Шаги статуса</span><span class="desc">Полоса шагов процесса и кнопки допустимых переходов вместо поля «Статус».</span></a>
+<a class="card" href="m4-read-mode.html"><span class="tag">У4</span><span class="name">Просмотр → правка</span><span class="desc">По умолчанию чистая карточка только для чтения, «Изменить» открывает поля.</span></a>
+<a class="card" href="m5-feed.html"><span class="tag">У5</span><span class="name">Лента справа</span><span class="desc">Описание и основные поля слева, справа лента истории, работ и обсуждения с полем ответа.</span></a>
+</div>
+<h3>На возможностях HTML</h3>
+<div class="grid">
+<a class="card" href="h1-tracker.html"><span class="tag">H1</span><span class="name">Как в трекере</span><span class="desc">Свойства-чипы справа с изменением на месте, активность и комментарии снизу.</span></a>
+<a class="card" href="h2-drawer.html"><span class="tag">H2</span><span class="name">Выезжающая панель</span><span class="desc">Заявка открывается панелью поверх списка, соседние заявки — стрелками.</span></a>
+<a class="card" href="h3-timeline.html"><span class="tag">H3</span><span class="name">Таймлайн</span><span class="desc">Суть заявки сверху, ниже вся её жизнь лентой с фильтром событий.</span></a>
+<a class="card" href="h4-dashboard.html"><span class="tag">H4</span><span class="name">Дашборд заявки</span><span class="desc">Кольцо план/факт, обратный отсчёт до срока, чек-лист из описания, график часов.</span></a>
+<a class="card" href="h5-chat.html"><span class="tag">H5</span><span class="name">Диалог с заказчиком</span><span class="desc">Переписка в центре, быстрые ответы и действия, описание — сворачиваемой плашкой.</span></a>
+</div>
+
+<h2>Рабочее место сотрудника · 25.10</h2>
+<p class="sub">Где разместить кнопки работы с заявкой и как перестроить экран исполнителя.</p>
+<div class="grid">
+<a class="card" href="a-buttons.html"><span class="tag">Вариант А</span><span class="name">Единая панель действий</span><span class="desc">Подгруппы «Работа / Заявка / Время»; «Начать» превращается в «Завершить» на том же месте.</span></a>
+<a class="card" href="b-buttons.html"><span class="tag">Вариант Б</span><span class="name">Главная кнопка и меню «Ещё»</span><span class="desc">Одна главная кнопка, «Изменить статус» со списком статусов, остальное — в меню.</span></a>
+<a class="card" href="c-buttons.html"><span class="tag">Вариант В</span><span class="name">Действия в строке и полоса таймера</span><span class="desc">▶ прямо в строке списка, над списком полоса «Идёт работа» с таймером.</span></a>
+<a class="card" href="p1-filters.html"><span class="tag">Прототип 1</span><span class="name">Плитки-фильтры и вкладки карточки</span><span class="desc">Плитки со счётчиками отбирают список; в карточке вкладки «Описание / Часы / История / Файлы».</span></a>
+<a class="card" href="p2-focus.html"><span class="tag">Прототип 2</span><span class="name">Очередь: одна заявка за раз</span><span class="desc">Крупная карточка текущей заявки, «Предыдущая / Следующая».</span></a>
+<a class="card" href="p3-kanban.html"><span class="tag">Прототип 3</span><span class="name">Канбан с прогрессом часов</span><span class="desc">Колонки по статусам, полоса «факт из плана», таймер прямо с карточки.</span></a>
+<a class="card" href="p4-sheet.html"><span class="tag">Прототип 4</span><span class="name">Боковая карточка над списком</span><span class="desc">Широкая таблица остаётся на месте, карточка выезжает справа.</span></a>
+<a class="card" href="p5-day.html"><span class="tag">Прототип 5</span><span class="name">Мой день: таймлайн</span><span class="desc">Шкала дня с текущим таймером; клик по свободному часу заполняет форму списания.</span></a>
 </div>
 
 <footer>Прототипы, а не рабочая программа: кнопки, кроме показанных переключений, ничего не сохраняют.</footer>

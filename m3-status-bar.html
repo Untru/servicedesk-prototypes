@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>У3 · Шаги статуса — форма заявки</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#EEEEEC;color:#1C1C1A;font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer}
+a{color:#1F5FBF;text-decoration:none}
+a:hover{color:#16478F;text-decoration:underline}
+:focus-visible{outline:2px solid #1F5FBF;outline-offset:2px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.muted{color:#5C5C58}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nowrap{white-space:nowrap}
+.red{color:#B42318}
+body[data-role=exec] .only-boss{display:none!important}
+
+/* Сцена и окно формы */
+.stage{max-width:1440px;margin:0 auto;padding:12px 16px 32px}
+.proto-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px;font-size:13px;color:#5C5C58}
+.proto-bar .lbl{font-weight:500}
+.seg{display:inline-flex;background:#E3E3DF;border-radius:20px;padding:2px}
+.seg button{border:0;background:transparent;border-radius:18px;min-height:30px;padding:0 12px;font-size:13px;color:#3D3D3A}
+.seg button[aria-pressed=true],.seg button[aria-checked=true]{background:#FFFFFF;color:#1C1C1A;font-weight:600;box-shadow:0 0 0 1px #CFCFCB}
+.win{background:#FFFFFF;border:1px solid #DADAD6;border-radius:12px;min-width:0}
+.win-head{display:flex;align-items:center;gap:4px;padding:8px 10px 2px 10px;min-width:0}
+.win-head h1{flex:1;min-width:0;margin:0 0 0 2px;font-size:20px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{flex:none;width:32px;height:32px;border:0;background:transparent;border-radius:8px;display:inline-grid;place-items:center;color:#5C5C58;padding:0}
+.icon-btn:hover{background:#F0F0ED;color:#1C1C1A}
+.icon-btn[aria-pressed=true]{color:#C99700}
+.icon-btn[aria-pressed=true] svg{--fill:#FFD23F}
+.cmdbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 16px 12px;border-bottom:1px solid #ECECE8}
+.cmdbar .sp{flex:1 1 0;min-width:0}
+.form{padding:16px}
+
+/* Кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 14px;border:0;border-radius:8px;background:#E6E6E3;color:#1C1C1A;white-space:nowrap;font-size:14px;line-height:1.2;text-decoration:none}
+.btn:hover{background:#DADAD6;color:#1C1C1A;text-decoration:none}
+.btn-main{background:#FFD23F;font-weight:600}
+.btn-main:hover{background:#F5C400}
+.btn-dark{background:#2A2A28;color:#FFFFFF;font-weight:600}
+.btn-dark:hover{background:#000000;color:#FFFFFF}
+.btn-sm{min-height:28px;padding:0 10px;font-size:13px;border-radius:6px}
+.btn-flat{background:transparent}
+.btn-flat:hover{background:#F0F0ED}
+.btn svg{flex:none}
+.btn .ico{display:inline-grid;place-items:center}
+.timer{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:#1C1C1A}
+.timer .t{min-width:52px}
+
+/* Поля ввода */
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld-l{font-size:12px;line-height:1.3;color:#5C5C58}
+.inp{position:relative;display:flex;align-items:center;min-height:32px;border:1px solid #CFCFCB;border-radius:6px;background:#FFFFFF;min-width:0}
+.inp:hover{border-color:#B5B5B0}
+.inp:focus-within{border-color:#D4A300;box-shadow:0 0 0 2px #FFE7A0}
+.inp input,.inp select{flex:1 1 auto;width:100%;min-width:0;border:0;background:transparent;height:30px;padding:0 8px;outline:none}
+.inp select{appearance:none;-webkit-appearance:none;padding-right:30px;cursor:pointer;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%235C5C58' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center}
+.inp .ib{flex:none;align-self:stretch;width:28px;border:0;background:transparent;color:#5C5C58;display:grid;place-items:center;padding:0;border-radius:0 5px 5px 0;font-weight:600;letter-spacing:.5px}
+.inp .ib:hover{background:#F3F3F0;color:#1C1C1A}
+.inp .ib:focus-visible{outline-offset:-2px}
+.inp .unit{flex:none;padding:0 8px 0 0;color:#5C5C58;font-size:13px}
+.inp-xl{min-height:44px;border-color:#E3E3DF}
+.inp-xl input{height:42px;font-size:22px;font-weight:600;padding:0 10px}
+.inp.num input{text-align:right;font-variant-numeric:tabular-nums}
+textarea.ta{display:block;width:100%;min-height:64px;border:1px solid #CFCFCB;border-radius:6px;padding:8px 10px;resize:vertical;background:#FFFFFF;line-height:1.45}
+textarea.ta:hover{border-color:#B5B5B0}
+textarea.ta:focus{outline:none;border-color:#D4A300;box-shadow:0 0 0 2px #FFE7A0}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;min-height:32px;cursor:pointer;user-select:none}
+.chk input{width:16px;height:16px;margin:0;accent-color:#2A2A28;cursor:pointer}
+.with-btn{display:flex;gap:8px;align-items:center;min-width:0}
+.with-btn>.inp{flex:1 1 auto}
+.hint{font-size:12px;color:#5C5C58;line-height:1.35}
+.quick{display:flex;gap:6px;flex-wrap:nowrap;min-width:0}
+.quick .btn{flex:1 1 0;min-width:0;padding:0 6px}
+
+/* Группы */
+.grp{display:flex;flex-direction:column;gap:12px;min-width:0}
+.grp-t{margin:0;font-size:15px;font-weight:600;line-height:1.3;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.grp-t .cnt{font-weight:500;color:#5C5C58}
+.grp-t .sp{flex:1}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;min-width:0}
+.meta{font-size:13px;color:#5C5C58;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center}
+.coll-h{display:flex;align-items:center;gap:8px;width:100%;white-space:nowrap;min-height:36px;padding:6px 8px;margin:0 -8px;border:0;background:transparent;border-radius:8px;text-align:left;font-weight:600;font-size:15px}
+.coll-h:hover{background:#F6F6F4}
+.coll-h .chev{flex:none;transition:none;color:#5C5C58}
+.coll-h[aria-expanded=true] .chev{transform:rotate(90deg)}
+.coll-h .sum{font-weight:400;font-size:13px;color:#5C5C58;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sep-line{border:0;border-top:1px solid #ECECE8;margin:0}
+
+/* Статус */
+.st{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
+.st::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--c)}
+.dot{display:inline-block;flex:none;width:10px;height:10px;border-radius:50%;background:var(--c)}
+.note{font-size:13px;line-height:1.4;color:#1C1C1A}
+.note .muted{white-space:nowrap}
+.imp-high{color:#1C1C1A;font-weight:600}
+.flag{display:inline-block;width:8px;height:8px;border-radius:2px;background:#F5A623;margin-right:6px;vertical-align:1px}
+
+/* Индикатор (поле индикатора) */
+.ind{height:6px;border-radius:3px;background:#ECECE8;overflow:hidden;min-width:60px}
+.ind>span{display:block;height:100%;background:#50B83C;border-radius:3px}
+.ind.over>span{background:#B42318}
+.pf{display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums}
+.pf b{font-size:16px}
+
+/* Табличная часть */
+.tbl-wrap{overflow-x:auto;border:1px solid #E3E3DF;border-radius:8px;background:#FFFFFF;min-width:0}
+.tbl-wrap:focus-visible{outline-offset:1px}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{background:#F6F6F4;color:#5C5C58;font-weight:500;text-align:left;padding:6px 10px;border-bottom:1px solid #E3E3DF;white-space:nowrap}
+.tbl td{padding:7px 10px;border-top:1px solid #F0F0ED;vertical-align:top}
+.tbl tbody tr:first-child td{border-top:0}
+.tbl tbody tr{cursor:default}
+.tbl tbody tr.cur td{background:#FFF4CC}
+.tbl tfoot td{border-top:1px solid #E3E3DF;background:#FBFBFA;font-weight:600}
+.tbl .st{font-weight:500}
+.tbl-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+/* Группа-страницы */
+.tabs{display:flex;gap:2px;border-bottom:1px solid #E3E3DF;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:6px 14px 4px;border:0;border-bottom:3px solid transparent;border-radius:6px 6px 0 0;background:transparent;color:#3D3D3A;font-size:14px;white-space:nowrap}
+.tab:hover{background:#F6F6F4;color:#1C1C1A}
+.tab[aria-selected=true]{border-bottom-color:#FFD23F;color:#1C1C1A;font-weight:600}
+.tab:focus-visible{outline-offset:-2px}
+.tab .cnt{font-size:12px;font-weight:500;color:#5C5C58;background:#F0F0ED;border-radius:10px;padding:1px 7px}
+.tabpanel{padding-top:16px;min-width:0}
+.tabpanel:focus-visible{outline-offset:4px;border-radius:4px}
+
+/* Форматированный документ */
+.fdoc{display:flex;flex-direction:column;border:1px solid #CFCFCB;border-radius:6px;background:#FFFFFF;min-width:0}
+.fdoc:focus-within{border-color:#D4A300;box-shadow:0 0 0 2px #FFE7A0}
+.fdoc-bar{display:flex;flex-wrap:wrap;gap:2px;padding:3px 4px;border-bottom:1px solid #ECECE8;background:#F6F6F4;border-radius:6px 6px 0 0}
+.fdoc-bar button{width:30px;height:28px;border:0;border-radius:6px;background:transparent;display:grid;place-items:center;color:#3D3D3A;padding:0;font-size:14px}
+.fdoc-bar button:hover{background:#E6E6E3}
+.fdoc-bar .vsep{width:1px;margin:4px 3px;background:#DADAD6}
+.fdoc-body{flex:1 1 auto;padding:10px 12px;min-height:180px;outline:none;line-height:1.55;overflow-wrap:anywhere}
+.fdoc-body p,.rich p{margin:0 0 6px}
+.fdoc-body ol,.fdoc-body ul,.rich ol,.rich ul{margin:0 0 6px;padding-left:22px}
+.rich{line-height:1.6;overflow-wrap:anywhere}
+
+/* Списки: файлы, сообщения, связи */
+.files{list-style:none;margin:0;padding:0}
+.files li{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid #F0F0ED;min-width:0}
+.files li:first-child{border-top:0}
+.files .fi{flex:none}
+.files .fn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.files .fs{margin-left:auto;font-size:12px;color:#5C5C58;white-space:nowrap}
+.msgs{display:flex;flex-direction:column}
+.msg{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid #F0F0ED}
+.msg:first-child{border-top:0}
+.ava{width:32px;height:32px;border-radius:50%;background:#E6E6E3;display:grid;place-items:center;font-size:12px;font-weight:600;color:#3D3D3A;flex:none}
+.ava.cust{background:#DCE8F8;color:#1F4E8C}
+.msg-h{font-size:12px;color:#5C5C58;display:flex;flex-wrap:wrap;gap:0 6px}
+.msg-h b{color:#1C1C1A;font-weight:600}
+.msg-t{margin-top:2px;overflow-wrap:anywhere}
+.reply{display:flex;flex-direction:column;gap:8px}
+.reply-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.tags{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;min-height:32px}
+.kv{display:grid;grid-template-columns:minmax(96px,auto) minmax(0,1fr);gap:8px 14px;margin:0;align-items:baseline}
+.kv dt{font-size:13px;color:#5C5C58}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+
+/* Всплывающие меню и списки выбора */
+.dd{position:relative;display:inline-flex}
+.menu{position:absolute;z-index:40;top:calc(100% + 4px);left:0;min-width:220px;max-width:calc(100vw - 32px);background:#FFFFFF;border:1px solid #CFCFCB;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.14);padding:4px;display:flex;flex-direction:column}
+.menu.to-left{left:auto;right:0}
+.inp>.menu{left:-1px;min-width:calc(100% + 2px)}
+.menu [role^=menuitem]{display:flex;align-items:center;gap:8px;width:100%;min-height:34px;padding:6px 10px;border:0;border-radius:6px;background:transparent;text-align:left;white-space:nowrap;font-size:14px}
+.menu [role^=menuitem]:hover,.menu [role^=menuitem]:focus{background:#FFF4CC;outline:none}
+.menu [role^=menuitem]:focus-visible{box-shadow:inset 0 0 0 2px #1F5FBF}
+.menu .menu-h{padding:6px 10px 4px;font-size:12px;color:#5C5C58;white-space:nowrap}
+.menu .menu-sep{height:1px;background:#ECECE8;margin:4px 2px}
+.menu .all{color:#1F5FBF}
+
+/* Оповещение (как ПоказатьОповещениеПользователя) */
+.toast{position:fixed;right:16px;bottom:16px;z-index:60;width:320px;max-width:calc(100vw - 32px);background:#FFFFFF;border:1px solid #CFCFCB;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.16);padding:12px 14px;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.toast b{font-size:14px}
+
+/* Идея прототипа */
+.idea{margin-top:16px;background:#F9F9F7;border:1px solid #E3E3DF;border-radius:12px;padding:14px 18px;font-size:14px;color:#3D3D3A}
+.idea h2{margin:0 0 6px;font-size:15px;font-weight:600;color:#1C1C1A}
+.idea ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.idea b{color:#1C1C1A;font-weight:600}
+
+@media (max-width:600px){
+  .stage{padding:10px 16px 24px}
+  .win-head h1{font-size:17px}
+  .cmdbar{padding:6px 12px 12px}
+  .form{padding:12px}
+  .btn,.btn-sm{min-height:40px}
+  .icon-btn{width:40px;height:40px}
+  .inp{min-height:40px}
+  .inp input,.inp select{height:38px}
+  .inp .ib{width:40px}
+  .inp-xl input{font-size:16px;padding:0 8px}
+  .proto-bar .long{display:none}
+  .win-head h1{font-size:16px}
+  .seg button{min-height:36px}
+  .fdoc-bar button{width:40px;height:40px}
+  .menu [role^=menuitem]{min-height:40px}
+  .chk{min-height:40px}
+  .coll-h{min-height:44px}
+  .kv{grid-template-columns:minmax(0,1fr)}
+  table.tbl{min-width:600px}
+  .reply-send .hint{display:none}
+  .kv dt{margin-top:4px}
+}
+.fld-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.inp.ro{background:#F6F6F4;border-color:#E3E3DF}
+.inp.ro input{color:#1C1C1A}
+.pf2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ind-row{display:flex;align-items:center;gap:10px}
+.ind-row .ind{flex:1}
+.ind-row .hint{white-space:nowrap}
+.st-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-height:32px}
+.f2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.rel{display:flex;flex-direction:column;gap:2px}
+.rel-m{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:13px}
+.reply-send{display:inline-flex;align-items:center;gap:10px;margin-left:auto}
+.econ{padding:12px;border:1px dashed #CFCFCB;border-radius:8px}
+.econ .kv{grid-template-columns:auto minmax(0,1fr)}
+@media (max-width:600px){.f2{grid-template-columns:minmax(0,1fr)}}
+
+/* Раскладка прототипа */
+.m3{display:flex;flex-direction:column;gap:16px}
+.m3-top{display:flex;flex-direction:column;gap:8px}
+.steps-box{display:flex;flex-direction:column;gap:12px;padding:14px 16px;border-radius:10px;background:#F6F6F4}
+.steps{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:2px 2px 42px;min-width:0}
+.step{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.step .branch{position:absolute;top:44px;left:0}
+.step-line{flex:1 1 24px;min-width:24px;max-width:120px;height:2px;margin-top:17px;background:#D6D6D2}
+.step-line.done{background:#8CC97E}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 14px 4px 5px;border:1px solid #DADAD6;border-radius:18px;background:#FFFFFF;color:#5C5C58;white-space:nowrap}
+.pill .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#ECECE8;color:#5C5C58;font-size:12px;font-weight:600}
+.step.done .pill{color:#1C1C1A}
+.step.done .pill .n{background:#E3F2DF;color:#2E7D32}
+.step.cur .pill,.branch.cur{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,#FFFFFF);color:#1C1C1A;font-weight:600}
+.step.cur .pill .n{background:var(--c);color:#FFFFFF}
+.step.via .pill{border-color:var(--c);color:#1C1C1A}
+.step.via .pill .n{background:#FFFFFF;box-shadow:inset 0 0 0 2px var(--c);color:#1C1C1A}
+.step.off .pill{opacity:.55}
+.branch{display:inline-flex;align-items:center;gap:7px;margin-left:14px;min-height:30px;padding:3px 12px 3px 8px;border:1px dashed #CFCFCB;border-radius:15px;background:transparent;color:#5C5C58;font-size:13px;white-space:nowrap}
+.branch .arr{color:#8A8A85}
+.branch.cur{border-style:solid}
+.st-act{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.st-act .now{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-width:0;flex:1 1 380px}
+.trans{display:flex;flex-wrap:wrap;gap:8px}
+.keyrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.1fr);gap:16px;align-items:start}
+.secs{display:flex;flex-direction:column;border-top:1px solid #ECECE8}
+.sec{border-bottom:1px solid #ECECE8;padding:6px 0}
+.sec-b{padding:6px 0 14px;display:flex;flex-direction:column;gap:14px}
+.sec-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px 28px}
+@media (max-width:1100px){.keyrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (max-width:700px){.keyrow,.sec-2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){
+  .steps{flex-direction:column;padding:2px}
+  .step-line{flex:none;width:2px;min-width:0;height:12px;margin:0 0 0 18px}
+  .step .branch{position:static;margin-left:28px}
+}
+</style>
+</head>
+<body data-role="boss">
+<nav id="pnav" class="pnav" aria-label="Прототипы"></nav>
+<script src="nav.js"></script>
+<main class="stage">
+<div class="proto-bar" role="group" aria-label="Настройка прототипа">
+<span class="lbl">Прототип · смотреть как</span>
+<span class="seg"><button type="button" data-role-btn="boss" aria-pressed="true">Руководитель<span class="long"> · Анна Смирнова</span></button><button type="button" data-role-btn="exec" aria-pressed="false">Исполнитель<span class="long"> · Даня Кузнецов</span></button></span>
+<span class="long">экономику заявки видит только руководитель</span>
+</div>
+<section class="win" aria-label="Форма документа «Заявка»">
+<div class="win-head">
+<button class="icon-btn" type="button" data-fav aria-pressed="false" aria-label="Избранное"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.8l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 8.1l5-.7z" fill="var(--fill,none)" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+<h1>Заявка №21746 от 26.10.2026</h1>
+<button class="icon-btn" type="button" aria-label="Скопировать ссылку на заявку" data-notify="Ссылка скопирована|Заявка №21746 — ссылку можно вставить в письмо"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.1-1.1a2.6 2.6 0 0 1 3.7 3.7l-1.1 1.1M8.8 11.4l-1.1 1.1A2.6 2.6 0 0 1 4 8.8l1.1-1.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+<button class="icon-btn" type="button" aria-label="Закрыть форму" data-notify="Закрыть форму|В прототипе окно остаётся открытым"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+</div>
+<div class="cmdbar"><button class="btn btn-main" type="button" data-work><span class="ico" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4a.5.5 0 0 0 .76.43l6.7-4.2a.5.5 0 0 0 0-.86L3.76 1.37A.5.5 0 0 0 3 1.8z" fill="currentColor"/></svg></span><span class="lbl">Начать работу</span></button><span class="timer" data-timer hidden><span class="dot" style="--c:#F5A623" aria-hidden="true"></span>В работе · <span class="t">0:00:00</span></span><button class="btn" type="button" data-notify="Изменение|Заявка №21746 от 26.10.2026 записана">Записать и закрыть</button>
+<button class="btn" type="button" data-notify="Изменение|Заявка №21746 от 26.10.2026 записана">Записать</button><span class="sp"></span><span class="dd"><button class="btn" type="button" data-menu aria-haspopup="menu" aria-expanded="false">Ещё <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<div class="menu" role="menu" aria-label="Ещё команды" hidden>
+<button type="button" role="menuitem" data-notify="Документ проведён|Заявка №21746 от 26.10.2026">Провести</button>
+<button type="button" role="menuitem" data-notify="Проведение отменено|Заявка №21746 от 26.10.2026">Отменить проведение</button>
+<div class="menu-sep" role="separator"></div>
+<button type="button" role="menuitem" data-notify="Печать|Откроется печатная форма «Заявка»">Печать…</button>
+<button type="button" role="menuitem" data-notify="Скопировать|Будет создана новая заявка по образцу №21746">Скопировать</button>
+<div class="menu-sep" role="separator"></div>
+<button type="button" role="menuitem" data-notify="Изменить форму|Откроется настройка формы">Изменить форму…</button>
+</div></span></div>
+<div class="form m3">
+<div class="m3-top">
+<div class="meta"><span>№21746</span><span aria-hidden="true">·</span><span>клиент <a href="#" data-client-text data-notify="ООО Альфа|Откроется карточка клиента">ООО Альфа</a></span><span aria-hidden="true">·</span><span>создана 26.10.2026 10:15</span><span aria-hidden="true">·</span><span>автор <a href="#" data-notify="Ольга Петрова|Заказчик, ООО Альфа">Ольга Петрова</a></span><span aria-hidden="true">·</span><span><span class="flag" aria-hidden="true"></span>Высокая</span></div>
+<div class="fld"><label class="sr-only" for="m3-title">Тема</label><div class="inp inp-xl"><input id="m3-title" value="Ошибка при проведении реализации" autocomplete="off"></div></div>
+</div>
+<div class="steps-box">
+<div class="steps" id="m3-steps" role="list" aria-label="Шаги процесса" tabindex="0"></div>
+<div class="st-act">
+<div class="now"><span class="fld-l">Сейчас</span><span class="st" data-status-label style="--c:#C2185B">Вопрос к автору</span><span class="note" data-status-note><span class="muted">27.10.2026 7:09 · Даня Кузнецов:</span> Уточните, на какой базе воспроизводится?</span></div>
+<div class="trans" id="m3-trans" role="group" aria-label="Перевести заявку"></div>
+</div>
+</div>
+<div class="keyrow">
+<div class="fld"><label class="fld-l" for="m3-client">Клиент</label>
+<div class="inp"><input id="m3-client" value="ООО Альфа" autocomplete="off" data-client><button class="ib" type="button" data-menu data-target="m3-client" aria-haspopup="menu" aria-expanded="false" aria-label="Выбрать клиента из списка"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="menu" role="menu" aria-label="Клиенты" hidden><button type="button" role="menuitem" data-pick="ООО Альфа">ООО Альфа</button><button type="button" role="menuitem" data-pick="ООО Бета">ООО Бета</button><button type="button" role="menuitem" data-pick="ТД «Север»">ТД «Север»</button><button type="button" role="menuitem" data-pick="Логистик Плюс">Логистик Плюс</button><button type="button" role="menuitem" data-pick="Пекарня «Колос»">Пекарня «Колос»</button><div class="menu-sep" role="separator"></div><button type="button" role="menuitem" class="all" data-notify="Выбор клиента|Откроется список «Клиенты»">Показать все</button></div><button class="ib" type="button" aria-label="Выбрать клиента в форме выбора" data-notify="Выбор клиента|Откроется форма выбора «Клиенты»">…</button></div></div>
+<div class="fld"><label class="fld-l" for="m3-exec">Исполнитель</label>
+<div class="with-btn"><div class="inp"><input id="m3-exec" value="Даня Кузнецов" autocomplete="off" data-exec><button class="ib" type="button" data-menu data-target="m3-exec" aria-haspopup="menu" aria-expanded="false" aria-label="Выбрать исполнителя из списка"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="menu" role="menu" aria-label="Сотрудники" hidden><button type="button" role="menuitem" data-pick="Анна Смирнова">Анна Смирнова</button><button type="button" role="menuitem" data-pick="Борис Котов">Борис Котов</button><button type="button" role="menuitem" data-pick="Даня Кузнецов">Даня Кузнецов</button><button type="button" role="menuitem" data-pick="Игорь Белов">Игорь Белов</button><button type="button" role="menuitem" data-pick="Денис Орлов">Денис Орлов <span class="muted">· «Подряд-Про»</span></button><div class="menu-sep" role="separator"></div><button type="button" role="menuitem" class="all" data-notify="Выбор сотрудника|Откроется список «Сотрудники»">Показать все</button></div></div>
+<button class="btn btn-sm" type="button" data-take="m3-exec">Беру себе</button></div></div>
+<div class="fld"><div class="fld-top"><label class="fld-l" for="m3-due">Срок</label><span class="hint">SLA: осталось 9 ч</span></div>
+<div class="inp"><input id="m3-due" value="28.10.2026 18:00" data-due-input inputmode="numeric" autocomplete="off"><button class="ib" type="button" aria-label="Выбрать срок в календаре" data-notify="Календарь|Откроется выбор даты и времени"><svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button></div>
+<div class="quick" role="group" aria-label="Быстро изменить срок"><button class="btn btn-sm" type="button" data-due="today" title="Сегодня до 18:00">Сегодня</button><button class="btn btn-sm" type="button" data-due="tomorrow" title="Завтра до 18:00">Завтра</button><button class="btn btn-sm" type="button" data-due="+1h" aria-label="Плюс час">+1 ч</button><button class="btn btn-sm" type="button" data-due="+1d" aria-label="Плюс день">+1 д</button></div></div>
+<div class="fld"><div class="pf2">
+<div class="fld"><label class="fld-l" for="m3-plan">План, ч</label><div class="inp num"><input id="m3-plan" value="3,00" data-plan inputmode="decimal" autocomplete="off"></div></div>
+<div class="fld"><label class="fld-l" for="m3-plan-f">Факт, ч</label><div class="inp num ro"><input id="m3-plan-f" value="1,75" data-fact readonly></div></div>
+</div>
+<div class="ind-row"><div class="ind" role="progressbar" aria-label="Факт из плана" aria-valuemin="0" aria-valuemax="100" aria-valuenow="58"><span data-fact-bar style="width:58%"></span></div><span class="hint" data-left>осталось 1,25 ч</span></div></div>
+</div>
+<div class="fld"><span class="fld-l" id="m3-desc-l">Описание</span><div class="fdoc"><div class="fdoc-bar" role="group" aria-label="Форматирование описания">
+<button type="button" data-cmd="bold" aria-label="Жирный" title="Жирный (Ctrl+B)"><b>Ж</b></button>
+<button type="button" data-cmd="italic" aria-label="Курсив" title="Курсив (Ctrl+I)"><i>К</i></button>
+<button type="button" data-cmd="underline" aria-label="Подчёркнутый" title="Подчёркнутый (Ctrl+U)"><u>Ч</u></button>
+<button type="button" data-cmd="red" aria-label="Выделить красным" title="Выделить красным"><span style="color:#B42318;font-weight:700;border-bottom:2px solid #B42318;line-height:1.1">А</span></button>
+<span class="vsep" aria-hidden="true"></span>
+<button type="button" data-cmd="insertOrderedList" aria-label="Нумерованный список" title="Нумерованный список"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M7 4h7M7 8h7M7 12h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><text x="1.5" y="5.8" font-size="5" font-family="Inter,sans-serif" fill="currentColor">1</text><text x="1.5" y="9.8" font-size="5" font-family="Inter,sans-serif" fill="currentColor">2</text><text x="1.5" y="13.8" font-size="5" font-family="Inter,sans-serif" fill="currentColor">3</text></svg></button>
+<button type="button" data-cmd="insertUnorderedList" aria-label="Маркированный список" title="Маркированный список"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M7 4h7M7 8h7M7 12h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="3" cy="4" r="1.2" fill="currentColor"/><circle cx="3" cy="8" r="1.2" fill="currentColor"/><circle cx="3" cy="12" r="1.2" fill="currentColor"/></svg></button>
+</div><div class="fdoc-body" id="m3-desc" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="m3-desc-l" style="min-height:200px"><p>При проведении документа «Реализация товаров и услуг» РТ-0457 от 26.10.2026 программа выдаёт ошибку, документ не проводится.</p>
+<p>Как воспроизвести:</p>
+<ol><li>Открыть реализацию РТ-0457, склад «Основной».</li><li>Нажать «Провести и закрыть».</li><li>Появляется сообщение об ошибке:</li></ol>
+<p class="red">Недостаточно товара «Кабель ВВГ 3×2,5» на складе «Основной»: требуется 120 м, остаток 0 м.</p>
+<p><b>По отчёту «Остатки товаров» кабель есть — 340 м, приход от 25.10.2026.</b></p>
+<p>Отгрузка клиенту стоит, нужно исправить до конца дня 28.10.</p></div></div></div>
+<div class="secs">
+<section class="sec"><button class="coll-h" type="button" data-coll aria-expanded="true" aria-controls="m3-s1"><svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Трудозатраты <span class="sum"><span data-fact>1,75</span> из <span data-plan-text>3</span> ч · записей <span data-work-count>3</span></span></button>
+<div class="sec-b" id="m3-s1"><div class="tbl-bar"><button class="btn btn-sm" type="button" data-notify="Списать время|Откроется форма трудозатрат по заявке"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Списать время</button></div><div class="tbl-wrap" aria-label="Трудозатраты" role="region"><table class="tbl"><thead><tr><th>Дата</th><th>Исполнитель</th><th class="num">Часы</th><th>Что сделано</th></tr></thead><tbody data-worklog="full"><tr><td class="nowrap">26.10.2026</td><td class="nowrap">Даня Кузнецов</td><td class="num">0,50</td><td>Проверил проведение на копии базы от 25.10 — ошибки нет</td></tr><tr><td class="nowrap">26.10.2026</td><td class="nowrap">Даня Кузнецов</td><td class="num">0,75</td><td>Сверил движения по регистру «Товары на складах», нашёл расхождение партий</td></tr><tr><td class="nowrap">27.10.2026</td><td class="nowrap">Даня Кузнецов</td><td class="num">0,50</td><td>Собрал журнал регистрации, подготовил вопрос автору</td></tr></tbody><tfoot><tr><td colspan="2">Итого</td><td class="num" data-fact>1,75</td><td></td></tr></tfoot></table></div></div></section>
+<section class="sec"><button class="coll-h" type="button" data-coll aria-expanded="false" aria-controls="m3-s2"><svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Обсуждение <span class="sum">сообщений <span data-msg-count>3</span> · последнее: Даня Кузнецов, 27.10.2026 7:12</span></button>
+<div class="sec-b" id="m3-s2" hidden><div class="msgs" data-msgs><div class="msg"><span class="ava cust" aria-hidden="true">ОП</span><div><div class="msg-h"><b>Ольга Петрова</b><span>заказчик</span><span>26.10.2026 10:20</span></div><div class="msg-t">Прикладываю скриншот ошибки и выгрузку остатков. Отгрузка стоит, очень ждём.</div></div></div><div class="msg"><span class="ava" aria-hidden="true">ДК</span><div><div class="msg-h"><b>Даня Кузнецов</b><span>исполнитель</span><span>26.10.2026 16:05</span></div><div class="msg-t">На копии базы от 25.10 ошибка не воспроизводится. Похоже, дело в партиях после пересчёта.</div></div></div><div class="msg"><span class="ava" aria-hidden="true">ДК</span><div><div class="msg-h"><b>Даня Кузнецов</b><span>исполнитель</span><span>27.10.2026 7:12</span></div><div class="msg-t">Пришлите, пожалуйста, скриншот окна «О программе» — нужна версия конфигурации.</div></div></div></div><div class="reply"><label class="sr-only" for="m3-reply">Текст ответа</label><textarea class="ta" id="m3-reply" data-reply rows="2" placeholder="Ответить в обсуждении…"></textarea>
+<div class="reply-bar"><label class="chk"><input type="checkbox" id="m3-reply-pub" checked> Видно заказчику</label><span class="reply-send"><span class="hint">Ctrl+Enter</span><button class="btn" type="button" data-send="m3-reply" data-public="m3-reply-pub">Отправить</button></span></div></div></div></section>
+<section class="sec"><button class="coll-h" type="button" data-coll aria-expanded="false" aria-controls="m3-s3"><svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>История статусов <span class="sum">событий <span data-history-count>4</span></span></button>
+<div class="sec-b" id="m3-s3" hidden><div class="tbl-wrap" aria-label="История статусов" role="region"><table class="tbl"><thead><tr><th>Когда</th><th>Кто</th><th>Статус</th><th>Комментарий</th></tr></thead><tbody data-history><tr><td class="nowrap">26.10.2026 10:15</td><td class="nowrap">Ольга Петрова</td><td><span class="st" style="--c:#4A90E2">Новая</span></td><td>Заявка создана из письма заказчика</td></tr><tr><td class="nowrap">26.10.2026 11:02</td><td class="nowrap">Анна Смирнова</td><td><span class="st" style="--c:#F5A623">В работе</span></td><td>Назначен исполнитель Даня Кузнецов</td></tr><tr><td class="nowrap">26.10.2026 17:45</td><td class="nowrap">Анна Смирнова</td><td><span class="st" style="--c:#F5A623">В работе</span></td><td>Срок перенесён на 28.10.2026 18:00 по просьбе заказчика</td></tr><tr><td class="nowrap">27.10.2026 7:09</td><td class="nowrap">Даня Кузнецов</td><td><span class="st" style="--c:#C2185B">Вопрос к автору</span></td><td>Уточните, на какой базе воспроизводится?</td></tr></tbody></table></div></div></section>
+<section class="sec"><button class="coll-h" type="button" data-coll aria-expanded="false" aria-controls="m3-s4"><svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Реквизиты, файлы и связи <span class="sum">Ошибка · #склад #проведение · HD-8841 · файлы 2 · связи 1</span></button>
+<div class="sec-b" id="m3-s4" hidden><div class="sec-2">
+<div class="grp"><div class="f2"><div class="fld"><label class="fld-l" for="m3-imp">Важность</label><div class="inp"><select id="m3-imp"><option>Обычная</option><option selected>Высокая</option><option>Критичная</option></select></div></div><div class="fld"><label class="fld-l" for="m3-cat">Категория</label><div class="inp"><select id="m3-cat"><option selected>Ошибка</option><option>Консультация</option><option>Доработка</option><option>Обновление</option><option>Настройка прав</option></select></div></div></div><div class="f2"><div class="fld"><label class="fld-l" for="m3-hd">Номер HD</label><div class="inp"><input id="m3-hd" value="HD-8841" autocomplete="off"></div></div><div class="fld"><label class="fld-l" for="m3-proj">Проект / этап</label><div class="inp"><input id="m3-proj" value="Сопровождение 2026" autocomplete="off"><button class="ib" type="button" aria-label="Выбрать проект" data-notify="Выбор проекта|Откроется форма выбора «Проекты»">…</button></div></div></div><div class="fld"><span class="fld-l">Теги</span><div class="tags"><a href="#" data-notify="Тег «склад»|Откроется список заявок с этим тегом">#склад</a><a href="#" data-notify="Тег «проведение»|Откроется список заявок с этим тегом">#проведение</a><a href="#" data-notify="Добавить тег|Откроется выбор тега">+ тег</a></div></div></div>
+<div class="grp"><h3 class="grp-t">Файлы <span class="cnt">2</span></h3><ul class="files" data-files>
+<li><svg class="fi" width="22" height="26" viewBox="0 0 22 26" aria-hidden="true"><path d="M3 1.5h11l5.5 5.5v17.5H3z" fill="#FFFFFF" stroke="#B5B5B0"/><path d="M14 1.5V7h5.5" fill="none" stroke="#B5B5B0"/><rect x="5" y="13" width="12" height="8" rx="1" fill="#4A90E2"/><path d="M6 20l3.5-4 2.5 2.5 1.5-1.5 2.5 3z" fill="#FFFFFF"/></svg><a class="fn" href="#" data-notify="ошибка_проведения.png|Файл откроется в программе просмотра">ошибка_проведения.png</a><span class="fs">184 КБ · 26.10</span></li>
+<li><svg class="fi" width="22" height="26" viewBox="0 0 22 26" aria-hidden="true"><path d="M3 1.5h11l5.5 5.5v17.5H3z" fill="#FFFFFF" stroke="#B5B5B0"/><path d="M14 1.5V7h5.5" fill="none" stroke="#B5B5B0"/><rect x="5" y="13" width="12" height="8" rx="1" fill="#2E7D4F"/><path d="M8 14.8l6 4.4M14 14.8l-6 4.4" stroke="#FFFFFF" stroke-width="1.4"/></svg><a class="fn" href="#" data-notify="остатки_кабель_25-10.xlsx|Файл откроется в табличном редакторе">остатки_кабель_25-10.xlsx</a><span class="fs">36 КБ · 26.10</span></li>
+</ul><a href="#" data-notify="Добавить файл|Откроется выбор файла на компьютере">+ Добавить файл</a><h3 class="grp-t">Связанные заявки <span class="cnt">1</span></h3><div class="rel"><a href="#" data-notify="Заявка №21702|Откроется форма связанной заявки">№21702 Обновить конфигурацию до 3.1.12</a><span class="rel-m"><span class="st" style="--c:#50B83C">Выполнена</span><span class="muted">· возможная причина</span></span></div></div>
+</div></div></section>
+<section class="sec only-boss"><button class="coll-h" type="button" data-coll aria-expanded="false" aria-controls="m3-s5"><svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Экономика <span class="sum"><span data-sum>5&nbsp;250&nbsp;₽</span> · видно руководителю</span></button>
+<div class="sec-b" id="m3-s5" hidden><dl class="kv"><dt>Наша ставка</dt><dd>3&nbsp;000&nbsp;₽/ч</dd><dt>Сумма по факту</dt><dd><b data-sum>5&nbsp;250&nbsp;₽</b> <span class="hint" data-sum-calc>1,75 ч × 3&nbsp;000&nbsp;₽</span></dd></dl></div></section>
+</div>
+</div>
+</section>
+<section class="idea" aria-labelledby="idea-h">
+<h2 id="idea-h">Идея прототипа</h2>
+<ul>
+<li><b>Что упрощено:</b> поле «Статус» и строка с комментарием заменены полосой шагов процесса: видно, где заявка сейчас и что дальше. «Вопрос к автору» и «Пауза» показаны ответвлением от «В работе», а не отдельным шагом. Форма идёт в одну колонку: шаги, 4 ключевых поля в строку, описание и сворачиваемые разделы.</li>
+<li><b>Как работает:</b> под шагами только кнопки допустимых переходов для текущего статуса: из «Вопрос к автору» это «Вернуть в работу» и «Отменить», из «В работе» — «На проверку», «Задать вопрос автору», «Поставить на паузу». Нажмите переход, и полоса, кнопки и история обновятся. Жёлтая «Начать работу» тоже возвращает заявку в работу.</li>
+<li><b>Элементы формы:</b> горизонтальная группа декораций-надписей с цветом фона и рамки (шаги), их оформление задаётся из кода по статусу; кнопки переходов — команды формы с управляемой видимостью; поле индикатора; сворачиваемые обычные группы с «Заголовком свёрнутого отображения»; поле форматированного документа; табличные части.</li>
+</ul>
+</section>
+</main>
+<script>
+(function () {
+  'use strict';
+  var COLORS = { 'Новая': '#4A90E2', 'На оценке': '#F2C94C', 'На согласовании': '#EC407A', 'Согласовано': '#17A2B8', 'В работе': '#F5A623',
+    'Вопрос к автору': '#C2185B', 'Пауза': '#90A4AE', 'На проверке': '#9013FE', 'Протестировано': '#FF8C00', 'Выполнена': '#50B83C',
+    'Закрыта': '#637381', 'Отменена': '#A26A6A' };
+  var NEXT = { 'Новая': ['В работе', 'На оценке', 'Отменена'], 'На оценке': ['В работе', 'Отменена'],
+    'В работе': ['На проверке', 'Вопрос к автору', 'Пауза', 'Отменена'], 'Вопрос к автору': ['В работе', 'Отменена'],
+    'Пауза': ['В работе', 'Отменена'], 'На проверке': ['Выполнена', 'В работе'], 'Выполнена': ['Закрыта', 'В работе'],
+    'Закрыта': ['В работе'], 'Отменена': ['Новая'] };
+  var VERB = { 'В работе': 'Вернуть в работу', 'На оценке': 'На оценку', 'На проверке': 'На проверку', 'Вопрос к автору': 'Задать вопрос автору',
+    'Пауза': 'Поставить на паузу', 'Отменена': 'Отменить', 'Выполнена': 'Принять как выполненную', 'Закрыта': 'Закрыть', 'Новая': 'Восстановить' };
+  var USERS = { boss: 'Анна Смирнова', exec: 'Даня Кузнецов' };
+  var SD = window.SD = { status: 'Вопрос к автору', role: 'boss', fact: 1.75, plan: 3, rate: 3000,
+    due: new Date(2026, 9, 28, 18, 0), COLORS: COLORS, NEXT: NEXT, VERB: VERB, builders: {} };
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function num(x) { return x.toFixed(2).replace('.', ','); }
+  function money(x) { return Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽'; }
+  function fmtDur(sec) { return Math.floor(sec / 3600) + ':' + pad(Math.floor(sec / 60) % 60) + ':' + pad(sec % 60); }
+  function fmtDate(d) { return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function initials(n) { return n.split(' ').map(function (p) { return p.charAt(0); }).join('').slice(0, 2); }
+  SD.$ = $; SD.$$ = $$; SD.esc = esc; SD.num = num; SD.money = money; SD.fmtDur = fmtDur; SD.fmtDate = fmtDate; SD.initials = initials;
+  SD.user = function () { return USERS[SD.role]; };
+  SD.now = function () { var d = new Date(); return '27.10.2026 ' + d.getHours() + ':' + pad(d.getMinutes()); };
+  SD.stHtml = function (st) { return '<span class="st" style="--c:' + COLORS[st] + '">' + esc(st) + '</span>'; };
+  SD.dot = function (st) { return '<span class="dot" style="--c:' + COLORS[st] + '" aria-hidden="true"></span>'; };
+  function emit(name, detail) { document.dispatchEvent(new CustomEvent(name, { detail: detail })); }
+
+  /* Оповещение пользователя */
+  var toast = document.createElement('div');
+  toast.className = 'toast'; toast.setAttribute('role', 'status'); toast.hidden = true;
+  document.body.appendChild(toast);
+  SD.notify = function (title, text) {
+    toast.innerHTML = '<b>' + esc(title) + '</b>' + (text ? '<span>' + esc(text) + '</span>' : '');
+    toast.hidden = false;
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { toast.hidden = true; }, 3200);
+  };
+
+  /* Статус */
+  SD.setStatus = function (st, comment) {
+    var from = SD.status;
+    if (from === st) return;
+    SD.status = st;
+    var t = SD.now(), who = SD.user(), text = comment || ('статус «' + from + '» → «' + st + '»');
+    $$('[data-status-label]').forEach(function (el) { el.style.setProperty('--c', COLORS[st]); el.textContent = st; });
+    $$('[data-status-note]').forEach(function (el) { el.innerHTML = '<span class="muted">' + t + ' · ' + esc(who) + ':</span> ' + esc(text); });
+    $$('tbody[data-history]').forEach(function (tb) {
+      tb.insertAdjacentHTML('beforeend', '<tr><td class="nowrap">' + t + '</td><td class="nowrap">' + esc(who) + '</td><td>' + SD.stHtml(st) + '</td><td>' + esc(comment || ('Из «' + from + '»')) + '</td></tr>');
+    });
+    $$('[data-history-count]').forEach(function (el) { el.textContent = String(+el.textContent + 1); });
+    emit('sd:status', { from: from, to: st, time: t, who: who, comment: comment || '' });
+    SD.notify('Статус изменён', 'Заявка №21746: «' + st + '»');
+  };
+  SD.builders.status = function (menu) {
+    var html = '<div class="menu-h">Из «' + esc(SD.status) + '» можно перевести в</div>';
+    NEXT[SD.status].forEach(function (s) { html += '<button type="button" role="menuitem" data-status="' + esc(s) + '">' + SD.dot(s) + esc(s) + '</button>'; });
+    menu.innerHTML = html;
+  };
+
+  /* Меню и списки выбора */
+  var open = null, uid = 0;
+  function menuItems(menu) { return $$('[role^=menuitem]', menu).filter(function (i) { return !i.disabled && !i.hidden; }); }
+  function closeMenu(back) {
+    if (!open) return;
+    var o = open; open = null;
+    o.menu.hidden = true; o.btn.setAttribute('aria-expanded', 'false');
+    if (back) o.btn.focus();
+  }
+  function openMenu(btn, focusLast) {
+    var menu = btn.nextElementSibling;
+    if (!menu.id) menu.id = 'menu' + (++uid);
+    btn.setAttribute('aria-controls', menu.id);
+    var b = menu.getAttribute('data-build');
+    if (b && SD.builders[b]) SD.builders[b](menu, btn);
+    menu.classList.remove('to-left');
+    menu.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    open = { btn: btn, menu: menu };
+    var r = menu.getBoundingClientRect();
+    if (r.right > document.documentElement.clientWidth - 8) menu.classList.add('to-left');
+    var items = menuItems(menu);
+    if (items.length) items[focusLast ? items.length - 1 : 0].focus();
+  }
+  SD.closeMenu = closeMenu;
+  document.addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (open && open.menu.contains(t)) {
+      var items = menuItems(open.menu), i = items.indexOf(t);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
+      else if (e.key === 'Tab') { closeMenu(false); }
+      return;
+    }
+    if (t.matches && t.matches('[data-menu]') && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault(); if (open) closeMenu(false); openMenu(t, e.key === 'ArrowUp');
+    }
+    if (e.key === 'Escape' && open) closeMenu(true);
+  });
+
+  /* Единый обработчик нажатий */
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    var trig = t.closest('[data-menu]');
+    if (trig) {
+      e.preventDefault();
+      if (open && open.btn === trig) { closeMenu(false); return; }
+      closeMenu(false); openMenu(trig); return;
+    }
+    var it = open && t.closest('[role^=menuitem]');
+    if (it && open.menu.contains(it)) {
+      var o = open;
+      closeMenu(true);
+      if (it.hasAttribute('data-status')) SD.setStatus(it.getAttribute('data-status'));
+      if (it.hasAttribute('data-pick')) {
+        var inp = document.getElementById(o.btn.getAttribute('data-target'));
+        if (inp) { inp.value = it.getAttribute('data-pick'); inp.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+      if (it.hasAttribute('data-notify')) notifyFrom(it);
+      if (it.hasAttribute('data-do')) emit('sd:do', { what: it.getAttribute('data-do'), el: it });
+      return;
+    }
+    if (open && !open.menu.contains(t)) closeMenu(false);
+
+    var n = t.closest('[data-notify]');
+    if (n) { e.preventDefault(); notifyFrom(n); }
+    else if (t.closest('a[href="#"]')) e.preventDefault();
+
+    var c = t.closest('[data-coll]');
+    if (c) {
+      var on = c.getAttribute('aria-expanded') !== 'true';
+      c.setAttribute('aria-expanded', String(on));
+      document.getElementById(c.getAttribute('aria-controls')).hidden = !on;
+    }
+    var fav = t.closest('[data-fav]');
+    if (fav) {
+      var p = fav.getAttribute('aria-pressed') !== 'true';
+      fav.setAttribute('aria-pressed', String(p));
+      SD.notify(p ? 'Добавлено в избранное' : 'Удалено из избранного', 'Заявка №21746');
+    }
+    var w = t.closest('[data-work]');
+    if (w) toggleWork();
+    var due = t.closest('[data-due]');
+    if (due) shiftDue(due.getAttribute('data-due'));
+    var take = t.closest('[data-take]');
+    if (take) {
+      var ex = document.getElementById(take.getAttribute('data-take'));
+      ex.value = SD.user(); ex.dispatchEvent(new Event('change', { bubbles: true }));
+      SD.notify('Исполнитель изменён', SD.user() + ' — исполнитель заявки №21746');
+      var next = take.parentNode.querySelector('input'); if (next) next.focus();
+    }
+    var role = t.closest('[data-role-btn]');
+    if (role) setRole(role.getAttribute('data-role-btn'));
+    var send = t.closest('[data-send]');
+    if (send) sendMsg(send);
+    var row = t.closest('.tbl tbody tr');
+    if (row) setCur(row);
+  });
+  function notifyFrom(el) { var p = el.getAttribute('data-notify').split('|'); SD.notify(p[0], p[1] || ''); }
+
+  /* Таймер «Начать работу» → «Завершить работу» */
+  var ICON_PLAY = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4a.5.5 0 0 0 .76.43l6.7-4.2a.5.5 0 0 0 0-.86L3.76 1.37A.5.5 0 0 0 3 1.8z" fill="currentColor"/></svg>';
+  var ICON_STOP = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor"/></svg>';
+  var work = { on: false, start: 0, iv: 0 };
+  function tick() {
+    var sec = work.on ? Math.floor((Date.now() - work.start) / 1000) : 0;
+    $$('[data-timer]').forEach(function (el) { el.hidden = !work.on; var s = el.querySelector('.t'); if (s) s.textContent = fmtDur(sec); });
+  }
+  function renderWork() {
+    $$('[data-work]').forEach(function (b) {
+      b.classList.toggle('btn-main', !work.on); b.classList.toggle('btn-dark', work.on);
+      b.querySelector('.lbl').textContent = work.on ? 'Завершить работу' : 'Начать работу';
+      b.querySelector('.ico').innerHTML = work.on ? ICON_STOP : ICON_PLAY;
+    });
+    tick();
+  }
+  function toggleWork() {
+    if (!work.on) {
+      work.on = true; work.start = Date.now(); work.iv = setInterval(tick, 1000);
+      if (SD.status !== 'В работе') SD.setStatus('В работе', 'Начата работа по заявке');
+    } else {
+      work.on = false; clearInterval(work.iv);
+      SD.addWork(Math.max(1, Math.round((Date.now() - work.start) / 1000)));
+    }
+    renderWork();
+  }
+  SD.isWorking = function () { return work.on; };
+
+  /* Трудозатраты, план/факт, экономика */
+  SD.addWork = function (sec, what) {
+    var h = Math.max(0.01, Math.round(sec / 36) / 100), t = SD.now(), who = SD.user(), hs = num(h);
+    what = what || ('Работа по таймеру (' + fmtDur(sec) + ')');
+    SD.fact = Math.round((SD.fact + h) * 100) / 100;
+    $$('tbody[data-worklog]').forEach(function (tb) {
+      var short = tb.getAttribute('data-worklog') === 'short';
+      tb.insertAdjacentHTML('beforeend', '<tr><td class="nowrap">27.10.2026</td>' + (short ? '' : '<td class="nowrap">' + esc(who) + '</td>') + '<td class="num">' + hs + '</td><td>' + esc(what) + '</td></tr>');
+    });
+    $$('[data-work-count]').forEach(function (el) { el.textContent = String(+el.textContent + 1); });
+    SD.renderFact();
+    emit('sd:work', { hours: h, text: what, time: t, who: who });
+    SD.notify('Время списано', hs + ' ч по заявке №21746');
+  };
+  SD.renderFact = function () {
+    var p = SD.plan > 0 ? Math.round(SD.fact / SD.plan * 100) : 0;
+    $$('[data-fact]').forEach(function (el) { if (el.tagName === 'INPUT') el.value = num(SD.fact); else el.textContent = num(SD.fact); });
+    $$('[data-plan-text]').forEach(function (el) { el.textContent = num(SD.plan).replace(',00', ''); });
+    $$('[data-fact-bar]').forEach(function (el) {
+      el.style.width = Math.min(100, p) + '%';
+      var ind = el.parentNode; ind.setAttribute('aria-valuenow', String(p)); ind.setAttribute('aria-valuetext', p + '% плана');
+      ind.classList.toggle('over', p > 100);
+    });
+    $$('[data-fact-pct]').forEach(function (el) { el.textContent = p + '%'; });
+    $$('[data-left]').forEach(function (el) { var l = SD.plan - SD.fact; el.textContent = l >= 0 ? 'осталось ' + num(l) + ' ч' : 'сверх плана ' + num(-l) + ' ч'; el.classList.toggle('red', l < 0); });
+    $$('[data-sum]').forEach(function (el) { el.textContent = money(SD.fact * SD.rate); });
+    $$('[data-sum-calc]').forEach(function (el) { el.textContent = num(SD.fact) + ' ч × ' + money(SD.rate); });
+  };
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.matches('[data-plan]')) {
+      var v = parseFloat(t.value.replace(',', '.'));
+      if (isNaN(v) || v < 0) v = SD.plan;
+      SD.plan = v; t.value = num(v); SD.renderFact();
+    }
+    if (t.matches('[data-due-input]')) {
+      var m = /^(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})$/.exec(t.value.trim());
+      if (m) SD.due = new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]);
+      renderDue();
+    }
+    if (t.matches('[data-exec]')) { renderTake(); $$('[data-exec-text]').forEach(function (el) { el.textContent = t.value; }); }
+    if (t.matches('[data-client]')) $$('[data-client-text]').forEach(function (el) { el.textContent = t.value; });
+  });
+
+  /* Срок и быстрые кнопки */
+  function renderDue() {
+    var s = fmtDate(SD.due);
+    $$('[data-due-input]').forEach(function (i) { i.value = s; });
+    $$('[data-due-text]').forEach(function (el) { el.textContent = s; });
+  }
+  function shiftDue(k) {
+    var d = SD.due;
+    if (k === 'today') d = new Date(2026, 9, 27, 18, 0);
+    else if (k === 'tomorrow') d = new Date(2026, 9, 28, 18, 0);
+    else if (k === '+1h') d = new Date(d.getTime() + 3600e3);
+    else if (k === '+1d') d = new Date(d.getTime() + 86400e3);
+    SD.due = d; renderDue();
+  }
+  SD.renderDue = renderDue;
+
+  /* «Беру себе» и роль просмотра */
+  function renderTake() {
+    $$('[data-take]').forEach(function (b) {
+      var inp = document.getElementById(b.getAttribute('data-take'));
+      b.hidden = !!inp && inp.value === SD.user();
+    });
+  }
+  SD.renderTake = renderTake;
+  function setRole(r) {
+    SD.role = r; document.body.setAttribute('data-role', r);
+    $$('[data-role-btn]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-role-btn') === r)); });
+    $$('[data-user-text]').forEach(function (el) { el.textContent = SD.user(); });
+    renderTake();
+    emit('sd:role', { role: r });
+  }
+
+  /* Обсуждение */
+  SD.msgHtml = function (who, role, time, text, extra) {
+    return '<div class="msg"><span class="ava' + (role === 'заказчик' ? ' cust' : '') + '" aria-hidden="true">' + esc(initials(who)) + '</span><div><div class="msg-h"><b>' + esc(who) + '</b><span>' + esc(role) + '</span><span>' + esc(time) + '</span>' + (extra || '') + '</div><div class="msg-t">' + esc(text) + '</div></div></div>';
+  };
+  function sendMsg(btn) {
+    var box = document.getElementById(btn.getAttribute('data-send'));
+    var txt = box.value.trim();
+    if (!txt) { box.focus(); SD.notify('Сообщение пустое', 'Напишите текст ответа'); return; }
+    var t = SD.now(), who = SD.user(), role = SD.role === 'boss' ? 'руководитель' : 'исполнитель';
+    var pub = document.getElementById(btn.getAttribute('data-public') || '');
+    var internal = pub ? !pub.checked : false;
+    $$('[data-msgs]').forEach(function (list) { list.insertAdjacentHTML('beforeend', SD.msgHtml(who, role, t, txt, internal ? '<span>· внутреннее</span>' : '')); });
+    $$('[data-msg-count]').forEach(function (el) { el.textContent = String(+el.textContent + 1); });
+    box.value = '';
+    emit('sd:msg', { text: txt, time: t, who: who, role: role, internal: internal });
+    SD.notify('Сообщение отправлено', internal ? 'Видно только сотрудникам' : 'Ольга Петрова получит уведомление');
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target.matches('textarea[data-reply]')) {
+      var b = document.querySelector('[data-send="' + e.target.id + '"]'); if (b) { e.preventDefault(); b.click(); }
+    }
+  });
+
+  /* Вкладки (группа-страницы) */
+  SD.initTabs = function (root) {
+    $$('[role=tablist]', root).forEach(function (tl) {
+      var tabs = $$('[role=tab]', tl);
+      function sel(tab, focus) {
+        tabs.forEach(function (x) {
+          var on = x === tab;
+          x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1;
+          document.getElementById(x.getAttribute('aria-controls')).hidden = !on;
+        });
+        if (focus) tab.focus();
+      }
+      tabs.forEach(function (tab, i) {
+        tab.addEventListener('click', function () { sel(tab); });
+        tab.addEventListener('keydown', function (e) {
+          var j = null;
+          if (e.key === 'ArrowRight') j = (i + 1) % tabs.length;
+          else if (e.key === 'ArrowLeft') j = (i - 1 + tabs.length) % tabs.length;
+          else if (e.key === 'Home') j = 0;
+          else if (e.key === 'End') j = tabs.length - 1;
+          if (j !== null) { e.preventDefault(); sel(tabs[j], true); }
+        });
+      });
+      tl.selectTab = function (k) { sel(tabs[k], false); };
+    });
+  };
+
+  /* Текущая строка таблицы */
+  function setCur(row) {
+    var tb = row.parentNode;
+    $$('tr.cur', tb).forEach(function (r) { r.classList.remove('cur'); });
+    row.classList.add('cur');
+  }
+  document.addEventListener('keydown', function (e) {
+    var w = e.target;
+    if (!w.classList || !w.classList.contains('tbl-wrap') || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+    var rows = $$('tbody tr', w); if (!rows.length) return;
+    var cur = rows.indexOf($('tbody tr.cur', w));
+    var n = e.key === 'ArrowDown' ? Math.min(rows.length - 1, cur + 1) : Math.max(0, cur < 0 ? 0 : cur - 1);
+    e.preventDefault(); setCur(rows[n]); rows[n].scrollIntoView({ block: 'nearest' });
+  });
+
+  /* Форматированный документ: панель форматирования */
+  var saved = null;
+  document.addEventListener('selectionchange', function () {
+    var s = document.getSelection();
+    if (!s || !s.rangeCount) return;
+    var r = s.getRangeAt(0), n = r.commonAncestorContainer;
+    if (n.nodeType !== 1) n = n.parentNode;
+    if (n && n.closest && n.closest('[contenteditable=true]')) saved = r.cloneRange();
+  });
+  document.addEventListener('mousedown', function (e) { if (e.target.closest('[data-cmd]')) e.preventDefault(); });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cmd]'); if (!b) return;
+    var ed = b.closest('.fdoc').querySelector('[contenteditable=true]'); if (!ed) return;
+    ed.focus();
+    if (saved && ed.contains(saved.commonAncestorContainer)) { var s = document.getSelection(); s.removeAllRanges(); s.addRange(saved); }
+    var c = b.getAttribute('data-cmd');
+    if (c === 'red') document.execCommand('foreColor', false, '#B42318');
+    else document.execCommand(c, false, null);
+  });
+
+  /* Начальная отрисовка */
+  $$('.tbl-wrap').forEach(function (w) { if (!w.hasAttribute('tabindex')) w.tabIndex = 0; });
+  SD.initTabs(document);
+  renderWork(); renderDue(); renderTake(); SD.renderFact();
+})();
+
+(function () {
+  var PATH = ['Новая', 'В работе', 'На проверке', 'Выполнена'];
+  var BRANCH = { 'На оценке': 0, 'Вопрос к автору': 1, 'Пауза': 1 };
+  var stepsEl = document.getElementById('m3-steps'), transEl = document.getElementById('m3-trans');
+  function verb(from, to) {
+    if (to === 'В работе' && (from === 'Новая' || from === 'На оценке')) return 'Взять в работу';
+    return SD.VERB[to] || to;
+  }
+  function render() {
+    var s = SD.status, C = SD.COLORS, esc = SD.esc;
+    var pos = PATH.indexOf(s), branchAt = BRANCH.hasOwnProperty(s) ? BRANCH[s] : -1;
+    var cancelled = s === 'Отменена', closed = s === 'Закрыта';
+    if (pos < 0) pos = branchAt >= 0 ? branchAt : (closed ? PATH.length : -1);
+    var html = '';
+    PATH.forEach(function (name, i) {
+      var cls = 'step', mark = String(i + 1), cur = false;
+      if (cancelled) cls += ' off';
+      else if (i < pos) { cls += ' done'; mark = '✓'; }
+      else if (i === pos && branchAt < 0) { cls += ' cur'; cur = true; }
+      else if (i === pos) { cls += ' via'; mark = '✓'; }
+      var col = (cur || i === pos) ? C[name] : '#CFCFCB';
+      html += '<div class="' + cls + '" role="listitem" style="--c:' + col + '"' + (cur ? ' aria-current="step"' : '') + '>'
+        + '<span class="pill"><span class="n" aria-hidden="true">' + mark + '</span>' + esc(name) + (i < pos && !cancelled ? '<span class="sr-only"> — пройдено</span>' : '') + '</span>';
+      if (i === 1) {
+        var b = (branchAt === 1) ? s : 'Вопрос к автору';
+        var bc = branchAt === 1;
+        html += '<span class="branch' + (bc ? ' cur' : '') + '" style="--c:' + C[b] + '"' + (bc ? ' aria-current="step"' : '') + '><span class="arr" aria-hidden="true">↳</span>' + SD.dot(b) + esc(b) + (bc ? '' : '<span class="sr-only"> — возможное ответвление</span>') + '</span>';
+      }
+      if (i === 0 && branchAt === 0) html += '<span class="branch cur" style="--c:' + C[s] + '" aria-current="step"><span class="arr" aria-hidden="true">↳</span>' + SD.dot(s) + esc(s) + '</span>';
+      html += '</div>';
+      if (i < PATH.length - 1) html += '<span class="step-line' + (!cancelled && i < pos ? ' done' : '') + '" aria-hidden="true"></span>';
+    });
+    if (cancelled || closed) {
+      html += '<span class="step-line" aria-hidden="true"></span><div class="step cur" role="listitem" aria-current="step" style="--c:' + C[s] + '"><span class="pill"><span class="n" aria-hidden="true">' + (cancelled ? '✕' : '✓') + '</span>' + esc(s) + '</span></div>';
+    }
+    stepsEl.innerHTML = html;
+    transEl.innerHTML = SD.NEXT[s].map(function (t) {
+      return '<button class="btn" type="button" data-go="' + esc(t) + '">' + SD.dot(t) + esc(verb(s, t)) + '</button>';
+    }).join('');
+  }
+  transEl.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-go]'); if (!b) return;
+    SD.setStatus(b.getAttribute('data-go'));
+    var first = transEl.querySelector('button'); if (first) first.focus();
+  });
+  document.addEventListener('sd:status', render);
+  render();
+})();
+</script>
+</body>
+</html>

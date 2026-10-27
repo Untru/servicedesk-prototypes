@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H3 — таймлайн заявки</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---- общая основа прототипов H1–H5 ---- */
+:root{--bg:#EEEEEC;--sf:#FFFFFF;--sf2:#F6F6F4;--ln:#E3E3DF;--ln2:#CFCFCB;--tx:#1C1C1A;--mu:#5C5C58;--lk:#1F5FBF;--lkh:#16478F;--ye:#FFD23F;--yeh:#F5C518;--bk:#2A2A28;--bt:#E6E6E3;--bth:#DADAD6;--rd:#B42318;--q:#C2185B;--hov:#F1F1EE}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{margin:0}
+button,input,textarea,select{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer}
+a{color:var(--lk);text-decoration:none}
+a:hover{color:var(--lkh);text-decoration:underline}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--lk);outline-offset:2px}
+.sr{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.num{font-variant-numeric:tabular-nums}
+.mu{color:var(--mu)}
+.screen{max-width:1440px;margin:0 auto;padding:12px 16px 16px}
+.demo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 10px;font-size:12px;color:var(--mu)}
+.demo b{font-weight:600;color:#3D3D3A}
+.win{position:relative;background:var(--sf);border:1px solid var(--ln);border-radius:14px;box-shadow:0 1px 2px rgba(28,28,26,.05),0 8px 24px rgba(28,28,26,.05)}
+
+/* кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:36px;padding:0 14px;border:0;border-radius:8px;background:var(--bt);color:var(--tx);font-size:14px;font-weight:500;line-height:1.1;white-space:nowrap;text-decoration:none;transition:background-color .15s,box-shadow .15s,color .15s,transform .08s}
+.btn:hover{background:var(--bth);color:var(--tx);text-decoration:none}
+.btn:active{transform:translateY(1px)}
+.btn svg{flex:none}
+.btn-y{background:var(--ye);font-weight:600}.btn-y:hover{background:var(--yeh)}
+.btn-k{background:var(--bk);color:#FFFFFF;font-weight:600}.btn-k:hover{background:#3B3B38;color:#FFFFFF}
+.btn-g{background:transparent}.btn-g:hover{background:var(--hov)}
+.btn-o{background:var(--sf);box-shadow:inset 0 0 0 1px var(--ln2)}.btn-o:hover{background:var(--sf2)}
+.btn-i{width:36px;padding:0}
+.btn-lg{min-height:40px;padding:0 18px}
+.btn-pill{border-radius:20px}
+.btn-sm{min-height:30px;padding:0 10px;font-size:13px;border-radius:7px}
+.btn-sm.btn-i{width:30px;padding:0}
+.btn[disabled]{opacity:.5;cursor:default}
+
+/* кнопка таймера: жёлтая «Начать», чёрная «Завершить · 0:00:07» */
+.tbtn{position:relative;min-width:172px}
+.tbtn .tb-ic{display:inline-flex}
+.tbtn .tb-t{display:none;font-variant-numeric:tabular-nums;font-weight:600}
+.tbtn .tb-t::before{content:"·";margin:0 7px 0 1px;opacity:.6}
+.tbtn.is-run{background:var(--bk);color:#FFFFFF}
+.tbtn.is-run:hover{background:#3B3B38;color:#FFFFFF}
+.tbtn.is-run .tb-t{display:inline}
+.tbtn .tb-rec{display:none;width:8px;height:8px;border-radius:50%;background:var(--ye);box-shadow:0 0 0 0 rgba(255,210,63,.6);animation:rec 1.6s ease-out infinite}
+.tbtn.is-run .tb-rec{display:inline-block}
+.tbtn.is-run .tb-ic{display:none}
+.tbtn.flip{animation:flip .28s cubic-bezier(.2,.8,.2,1)}
+@keyframes rec{0%{box-shadow:0 0 0 0 rgba(255,210,63,.65)}70%{box-shadow:0 0 0 7px rgba(255,210,63,0)}100%{box-shadow:0 0 0 0 rgba(255,210,63,0)}}
+@keyframes flip{0%{transform:scale(.96)}60%{transform:scale(1.02)}100%{transform:none}}
+
+/* статус: цветная точка + текст */
+.st{display:inline-flex;align-items:center;gap:7px;min-height:24px;padding:2px 10px 2px 8px;border-radius:12px;font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;line-height:1.2}
+.dot{flex:none;display:inline-block;width:8px;height:8px;border-radius:50%}
+.st-btn{border:0;cursor:pointer;transition:filter .15s}
+.st-btn:hover{filter:brightness(.97)}
+.st-btn .chev{margin-left:2px;opacity:.6}
+.av{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:11px;font-weight:600;letter-spacing:.02em;color:#1C1C1A}
+.av-sm{width:22px;height:22px;font-size:10px}
+.av-lg{width:36px;height:36px;font-size:13px}
+.tag{display:inline-flex;align-items:center;min-height:24px;padding:0 10px;border-radius:12px;background:var(--sf2);box-shadow:inset 0 0 0 1px var(--ln);font-size:12px;color:#3D3D3A;white-space:nowrap}
+.tag::before{content:"#";color:#9A9A95;margin-right:2px}
+.imp{display:inline-flex;align-items:center;gap:6px}
+.kbd{display:inline-block;min-width:18px;padding:1px 5px;border-radius:5px;background:var(--sf2);box-shadow:inset 0 -1px 0 var(--ln2),inset 0 0 0 1px var(--ln);font:11px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--mu);text-align:center}
+
+/* описание заявки (форматированный текст) */
+.desc{font-size:14.5px;line-height:1.6;color:#262624}
+.desc p+p,.desc p+ol,.desc ol+p{margin-top:6px}
+.desc ol{padding-left:22px}
+.desc li{padding-left:2px}
+.desc li+li{margin-top:2px}
+.desc .d-red{color:var(--rd)}
+.desc b{font-weight:600}
+
+/* выпадающее меню */
+.menu{position:fixed;z-index:200;min-width:220px;max-width:calc(100vw - 16px);max-height:calc(100vh - 24px);overflow:auto;padding:6px;background:#FFFFFF;border-radius:12px;box-shadow:0 0 0 1px rgba(28,28,26,.08),0 14px 36px rgba(28,28,26,.18);animation:menuIn .14s ease-out;font-size:14px}
+.menu-h{padding:6px 10px 4px;font-size:12px;font-weight:500;color:var(--mu)}
+.menu-sep{height:1px;margin:6px 4px;background:var(--ln)}
+.mi{display:flex;align-items:center;gap:10px;width:100%;min-height:36px;padding:0 10px;border:0;border-radius:8px;background:transparent;text-align:left;white-space:nowrap}
+.mi:hover,.mi:focus{background:var(--hov)}
+.mi:focus-visible{outline:2px solid var(--lk);outline-offset:-2px}
+.mi .mi-h{margin-left:auto;padding-left:16px;font-size:12px;color:var(--mu)}
+.mi .mi-ck{margin-left:auto;padding-left:16px;color:var(--tx);font-weight:700}
+.mi .mi-ck.off{visibility:hidden}
+@keyframes menuIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
+
+/* диалог */
+.mback{position:fixed;top:0;right:0;bottom:0;left:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(28,28,26,.44);animation:fade .16s ease-out}
+.modal{width:100%;max-width:470px;padding:22px 22px 20px;background:#FFFFFF;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.28);animation:pop .2s cubic-bezier(.2,.8,.2,1)}
+.modal h2{font-size:18px;font-weight:600;line-height:1.3}
+.modal .m-sub{margin-top:4px;font-size:13px;color:var(--mu)}
+.m-time{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--sf2);font-size:13px;color:var(--mu)}
+.m-time b{font-size:16px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
+.m-time .tb-rec{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bk)}
+.modal label{display:block;margin-top:14px;font-size:13px;color:var(--mu)}
+.modal textarea{display:block;width:100%;min-height:96px;margin-top:6px;padding:10px 12px;border:1px solid var(--ln2);border-radius:10px;background:#FFFFFF;resize:vertical;font-size:14px;line-height:1.45}
+.modal textarea:focus{border-color:var(--lk);box-shadow:0 0 0 3px rgba(31,95,191,.16)}
+.modal textarea[aria-invalid=true]{border-color:var(--rd)}
+.m-err{min-height:18px;margin-top:6px;font-size:13px;color:var(--rd)}
+.m-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.m-note{margin-top:10px;font-size:12px;color:var(--mu)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+
+/* уведомления */
+.toasts{position:fixed;left:50%;bottom:20px;z-index:400;display:flex;flex-direction:column;align-items:center;gap:8px;width:calc(100vw - 24px);max-width:560px;transform:translateX(-50%);pointer-events:none}
+.toast{display:flex;align-items:center;gap:12px;max-width:100%;padding:10px 14px;border-radius:12px;background:#2A2A28;color:#FFFFFF;font-size:13px;box-shadow:0 10px 28px rgba(0,0,0,.25);animation:toastIn .22s cubic-bezier(.2,.8,.2,1)}
+.toast code{flex:none;font:11.5px/1.3 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#FFD23F;white-space:nowrap}
+.toast.out{opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* сегменты (radiogroup) */
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bt)}
+.seg button{min-height:30px;padding:0 12px;border:0;border-radius:7px;background:transparent;font-size:13px;font-weight:500;color:#3D3D3A;white-space:nowrap}
+.seg button:hover{color:var(--tx)}
+.seg button[aria-checked=true],.seg button[aria-selected=true]{background:#FFFFFF;color:var(--tx);box-shadow:0 1px 2px rgba(28,28,26,.12)}
+.seg .cnt{margin-left:6px;font-size:11px;color:var(--mu);font-variant-numeric:tabular-nums}
+
+/* только для руководителя */
+.role-exec .mgr-only{display:none!important}
+.role-mgr .exec-only{display:none!important}
+.mgr-badge{display:inline-flex;align-items:center;min-height:18px;padding:0 6px;border-radius:5px;background:#EDE7F6;color:#4A2A86;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+
+/* блок «Идея прототипа» */
+.idea{max-width:1440px;margin:6px auto 40px;padding:0 16px}
+.idea-in{display:grid;grid-template-columns:220px minmax(0,1fr);gap:10px 28px;padding:18px 22px;border:1px solid var(--ln);border-radius:14px;background:#FAFAF8}
+.idea h2{font-size:15px;font-weight:600}
+.idea .idea-k{margin-top:4px;font-size:12px;color:var(--mu)}
+.idea ul{display:grid;gap:7px;padding-left:18px;color:#3D3D3A;line-height:1.5}
+.idea li b{font-weight:600;color:var(--tx)}
+.idea code,.bridge code{padding:1px 5px;border-radius:5px;background:#EFEFEC;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#3D3D3A}
+.bridge{margin-top:12px;font-size:12.5px;color:var(--mu)}
+.bridge code{background:#2A2A28;color:#FFD23F}
+
+@media (max-width:600px){
+  .screen{padding:8px 8px 12px}
+  .btn{min-height:40px}
+  .btn-sm{min-height:36px}
+  .btn-i,.btn-sm.btn-i{width:40px}
+  .mi{min-height:44px}
+  .seg button{min-height:36px}
+  .mback{align-items:flex-end;padding:0}
+  .modal{max-width:none;border-radius:18px 18px 0 0;padding:20px 16px 18px}
+  .m-acts{flex-direction:column-reverse}
+  .m-acts .btn{width:100%;min-height:44px}
+  .idea{padding:0 8px}
+  .idea-in{grid-template-columns:1fr;padding:16px}
+  .toasts{bottom:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* ---- H3: карточка сути + лента жизни ---- */
+.sum{display:grid;grid-template-columns:minmax(0,1fr) 320px;grid-template-areas:"head act" "desc act";gap:0 28px;padding:28px 32px 26px;border-bottom:1px solid var(--ln);border-radius:14px 14px 0 0;background:linear-gradient(180deg,#FFFFFF 0%,#FCFCFA 100%)}
+.kick{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:13px;color:var(--mu)}
+.kick .no{font-weight:600;color:var(--tx)}
+.kick .imp{color:var(--tx)}
+.sum h1{margin-top:10px;font-size:28px;line-height:1.2;font-weight:700;letter-spacing:-.015em}
+.who{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:10px;font-size:14px;color:var(--mu)}
+.who .p{display:inline-flex;align-items:center;gap:7px;color:var(--tx)}
+.who .p small{font-size:12px;color:var(--mu)}
+.who .arr{color:#A5A5A0}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:0 11px;border-radius:14px;background:var(--sf2);box-shadow:inset 0 0 0 1px var(--ln);font-size:13px;color:#3D3D3A;white-space:nowrap}
+.chip b{font-weight:600;color:var(--tx)}
+.chips .st{min-height:28px;border-radius:14px;font-size:13px;padding:0 11px 0 10px}
+.dbox{position:relative;margin-top:18px;padding:14px 16px 10px;border-radius:12px;background:#FFFFFF;box-shadow:inset 0 0 0 1px var(--ln)}
+.dbox-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mu)}
+.dbox-h .btn{margin:-6px -8px -6px 0;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tx)}
+.dclip{position:relative;max-height:108px;overflow:hidden;transition:max-height .4s cubic-bezier(.2,.8,.2,1)}
+.dclip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(180deg,rgba(255,255,255,0),#FFFFFF);transition:opacity .3s;pointer-events:none}
+.dbox.open .dclip::after{opacity:0}
+.dmore{display:inline-flex;align-items:center;gap:6px;min-height:32px;margin-top:4px;padding:0 10px 0 8px;border:0;border-radius:8px;background:transparent;color:var(--lk);font-size:13.5px;font-weight:500}
+.dmore:hover{background:#EEF3FB}
+.dmore svg{transition:transform .25s}
+.dbox.open .dmore svg{transform:rotate(180deg)}
+
+.sum-head{grid-area:head}.sum-desc{grid-area:desc}
+.act-card{grid-area:act;align-self:start;padding:16px;border-radius:14px;background:#FFFFFF;box-shadow:0 0 0 1px var(--ln),0 6px 18px rgba(28,28,26,.05)}
+.act-card .tbtn{width:100%;min-height:46px;font-size:15px}
+.ac-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.ac-row .btn{width:100%}
+.ac-pf{margin-top:16px;padding-top:14px;border-top:1px solid var(--ln)}
+.ac-pf .r{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;color:var(--mu)}
+.ac-pf .r b{font-size:18px;color:var(--tx)}
+.pbar{height:8px;margin-top:8px;border-radius:4px;background:#E6E6E3;overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:4px;background:#2A2A28;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.ac-pf .s{margin-top:6px;font-size:12px;color:var(--mu)}
+.ac-money{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 12px;border-radius:10px;background:#F7F4FC;font-size:13px}
+.ac-money b{font-size:16px}
+
+.tl{display:grid;grid-template-columns:230px minmax(0,1fr);gap:0}
+.rail{border-right:1px solid var(--ln)}
+.rail-in{position:-webkit-sticky;position:sticky;top:calc(var(--navh,56px) + 8px);padding:22px 16px 22px 20px}
+.rail h2{font-size:15px;font-weight:600}
+.rail .k{margin-top:2px;font-size:12px;color:var(--mu)}
+.flt{display:flex;flex-direction:column;gap:2px;margin-top:14px}
+.flt button{display:flex;align-items:center;gap:10px;min-height:36px;padding:0 10px;border:0;border-radius:9px;background:transparent;font-size:14px;text-align:left;color:#3D3D3A}
+.flt button:hover{background:var(--hov)}
+.flt button[aria-checked=true]{background:#2A2A28;color:#FFFFFF}
+.flt button[aria-checked=true] .n{color:#D8D8D4}
+.flt .fi{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:inset 0 0 0 1px var(--ln);color:var(--mu)}
+.flt .n{margin-left:auto;font-size:12px;color:var(--mu);font-variant-numeric:tabular-nums}
+.rail .seg{margin-top:16px}
+.rail .life{margin-top:18px;padding-top:14px;border-top:1px solid var(--ln);font-size:12.5px;line-height:1.7;color:var(--mu)}
+.rail .life b{color:var(--tx);font-weight:600}
+
+.feed{padding:8px 32px 36px 24px;min-width:0}
+.day{position:-webkit-sticky;position:sticky;top:var(--navh,56px);z-index:2;display:flex;align-items:center;gap:10px;margin:0 -8px;padding:14px 8px 10px;background:linear-gradient(180deg,#FFFFFF 75%,rgba(255,255,255,0));font-size:13px;font-weight:600}
+.day span{font-weight:400;color:var(--mu)}
+.day[hidden]{display:none}
+.ev{list-style:none;margin:0;padding:0;position:relative}
+.ev::before{content:"";position:absolute;left:73px;top:0;bottom:0;width:2px;border-radius:1px;background:#ECECE8}
+.it{position:relative;display:grid;grid-template-columns:56px 36px minmax(0,1fr);gap:0 12px;padding:6px 0 14px}
+.it[hidden]{display:none}
+.it .tm{padding-top:6px;text-align:right;font-size:12px;color:#8A8A85;font-variant-numeric:tabular-nums}
+.node{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;margin-left:2px;border-radius:50%;background:#FFFFFF;box-shadow:0 0 0 4px #FFFFFF,inset 0 0 0 1.5px var(--ln2);color:var(--mu)}
+.node.st{box-shadow:0 0 0 4px #FFFFFF;background:var(--c);color:#FFFFFF}
+.node.work{background:#2A2A28;color:#FFD23F;box-shadow:0 0 0 4px #FFFFFF}
+.node.file{color:#1F5FBF;box-shadow:0 0 0 4px #FFFFFF,inset 0 0 0 1.5px #BBD0EE;background:#F2F6FC}
+.node.msg{color:#3D3D3A}
+.body{min-width:0;padding-top:5px;font-size:14px;color:var(--mu);line-height:1.5}
+.body b{font-weight:600;color:var(--tx)}
+.body .st{vertical-align:1px;margin:0 2px}
+.body .arr{color:#A5A5A0;margin:0 2px}
+.bubble{margin-top:6px;padding:10px 14px;border-radius:4px 14px 14px 14px;background:var(--sf2);color:var(--tx);font-size:14.5px;line-height:1.55;max-width:640px}
+.bubble.us{background:#FFF6D6}
+.quote{margin-top:8px;padding:10px 14px;border-radius:10px;background:#FCF1F5;box-shadow:inset 3px 0 0 var(--c,#C2185B);color:var(--tx);font-size:14.5px;max-width:640px}
+.wk{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.wk .h{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:11px;background:#2A2A28;color:#FFFFFF;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.wk .tx{color:var(--tx)}
+.fcard{display:inline-flex;align-items:center;gap:12px;margin-top:6px;padding:8px 14px 8px 8px;border:1px solid var(--ln);border-radius:12px;background:#FFFFFF;color:var(--tx);max-width:100%}
+.fcard:hover{border-color:var(--ln2);text-decoration:none;color:var(--tx);box-shadow:0 2px 8px rgba(28,28,26,.06)}
+.fcard .fn{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fcard .fm{display:block;font-size:12px;color:var(--mu)}
+.fcard>span:last-child{min-width:0}
+.it.fresh .body{animation:hl 2s ease-out}
+.it.fresh{animation:slideIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes hl{0%{background-color:#FFF4C2}100%{background-color:transparent}}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.now .node{background:var(--c);color:#FFFFFF;box-shadow:0 0 0 4px #FFFFFF}
+.now .node::after{content:"";position:absolute;top:-4px;right:-4px;bottom:-4px;left:-4px;border-radius:50%;border:2px solid var(--c);opacity:0;animation:ring 2s ease-out infinite}
+@keyframes ring{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+.now .tm{color:var(--tx);font-weight:600}
+.now-card{margin-top:2px;padding:14px 16px;border-radius:14px;background:#FFFFFF;box-shadow:0 0 0 1px var(--ln),0 6px 18px rgba(28,28,26,.05)}
+.now-t{font-size:14px;color:var(--mu)}
+.now-t b{color:var(--tx)}
+.now-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.cmp{display:flex;gap:8px;align-items:flex-end;margin-top:12px}
+.cmp textarea{flex:1;min-width:0;min-height:42px;max-height:160px;padding:10px 12px;border:1px solid var(--ln2);border-radius:10px;resize:vertical;font-size:14px;line-height:1.45}
+.cmp textarea:focus{border-color:var(--lk);box-shadow:0 0 0 3px rgba(31,95,191,.14)}
+.cmp .btn.ready{background:var(--ye);font-weight:600}
+
+@media (max-width:1100px){
+  .sum{grid-template-columns:minmax(0,1fr) 280px;padding:24px}
+}
+@media (max-width:820px){
+  .sum{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "act" "desc";gap:0}
+  .act-card{margin-top:16px}
+  .tl{grid-template-columns:minmax(0,1fr)}
+  .rail{border-right:0;border-bottom:1px solid var(--ln)}
+  .rail-in{position:static;padding:16px}
+  .flt{flex-direction:row;flex-wrap:wrap;gap:6px}
+  .flt button{min-height:36px;box-shadow:inset 0 0 0 1px var(--ln);border-radius:18px}
+  .flt .n{margin-left:2px}
+  .rail .life{display:none}
+  .feed{padding:4px 16px 28px 8px}
+}
+@media (max-width:600px){
+  .sum{padding:18px 14px}
+  .sum h1{font-size:23px}
+  .flt .fi{display:none}
+  .ev::before{left:61px}
+  .it{grid-template-columns:44px 36px minmax(0,1fr);gap:0 8px}
+  .feed{padding:4px 12px 24px 4px}
+}
+</style>
+</head>
+<body>
+<nav id="pnav" class="pnav" aria-label="Прототипы"></nav>
+<script src="nav.js"></script>
+
+<main class="screen">
+  <div class="demo"><span>Форма заявки в HTML-поле · <b>H3 «Таймлайн»</b></span><span class="js-role"></span></div>
+  <div class="win">
+    <section class="sum" aria-labelledby="ttl">
+      <div class="sum-head">
+        <div class="kick"><span class="no num">№21746</span><span class="js-cat">Ошибка</span><span class="imp js-imp"></span><span>создана 26.10.2026 9:12</span></div>
+        <h1 id="ttl">Ошибка при проведении реализации</h1>
+        <div class="who">
+          <span class="p"><i data-av="Ольга Петрова" data-cls="av-sm"></i>Ольга Петрова <small>ООО Альфа · заказчик</small></span>
+          <span class="arr" aria-hidden="true">→</span>
+          <span class="p js-assignee"></span>
+        </div>
+        <div class="chips js-chips"></div>
+      </div>
+      <div class="act-card">
+        <span class="js-timer-slot"></span>
+        <div class="ac-row">
+          <button type="button" class="btn js-st" aria-haspopup="menu" aria-expanded="false" aria-label="Статус — изменить">Статус<i data-ic="chev"></i></button>
+          <button type="button" class="btn js-reply"><i data-ic="chat"></i>Ответить</button>
+        </div>
+        <div class="ac-pf js-pf"></div>
+        <div class="ac-money mgr-only js-money"></div>
+      </div>
+      <div class="sum-desc">
+        <div class="dbox js-dbox">
+          <div class="dbox-h"><span>Описание</span><a class="btn btn-g btn-sm" href="#do|editDescription|21746" data-msg="1С откроет редактор описания"><i data-ic="edit"></i>Изменить</a></div>
+          <div class="dclip js-dclip" id="dclip"><div class="desc js-desc"></div></div>
+          <button type="button" class="dmore js-dmore" aria-expanded="false" aria-controls="dclip"><span>Показать всё</span><i data-ic="chev"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="tl" aria-labelledby="tlT">
+      <div class="rail"><div class="rail-in">
+        <h2 id="tlT">Жизнь заявки</h2>
+        <p class="k">все события в одной ленте</p>
+        <div class="flt js-flt" role="radiogroup" aria-label="Тип событий"></div>
+        <div class="seg js-sort" role="radiogroup" aria-label="Порядок">
+          <button type="button" role="radio" data-v="asc" aria-checked="true">Сначала старые</button>
+          <button type="button" role="radio" data-v="desc" aria-checked="false">Новые</button>
+        </div>
+        <p class="life js-life"></p>
+      </div></div>
+      <div class="feed js-feed" aria-live="off"></div>
+    </section>
+  </div>
+</main>
+
+<section class="idea" aria-labelledby="ideaT">
+  <div class="idea-in">
+    <div><h2 id="ideaT">Идея прототипа</h2><p class="idea-k">H3 · таймлайн</p></div>
+    <div>
+      <ul>
+        <li><b>Суть сверху, жизнь ниже.</b> Карточка сути отвечает «что, у кого, к какому сроку», описание свёрнуто до 4 строк. Ниже — одна лента вместо вкладок Ход работы / Часы / Обсуждение / Файлы.</li>
+        <li><b>Лента по дням</b> с узлами разного вида: переходы статусов с комментарием, сообщения, трудозатраты, файлы; фильтр типа событий и порядок слева. Внизу — «Сейчас»: чего ждём и сколько.</li>
+        <li><b>В HTML:</b> сворачивание описания, фильтр и сортировка ленты, анимация новых событий, тиканье таймера, черновик сообщения.</li>
+        <li><b>Через 1С</b> (<code>#do|действие|ключ</code>): старт/стоп и «Что сделано?», смена статуса, отправка сообщения, открытие файлов и связанной заявки; 1С собирает ленту запросом из истории, обсуждения, трудозатрат и файлов и перерисовывает поле.</li>
+      </ul>
+      <p class="bridge">Последняя команда для 1С: <code class="js-bridge">пока не было</code></p>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ---- общая основа прототипов H1–H5: данные, таймер, диалог, меню, уведомления ---- */
+(function () {
+  'use strict';
+  var SD = window.SD = {};
+
+  /* ---------- утилиты ---------- */
+  var ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  SD.esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ESC[c]; }); };
+  SD.h = function (v) { var s = (Math.round(v * 100) / 100).toFixed(2).replace('.', ','); return s.replace(/,00$/, '').replace(/(,\d)0$/, '$1'); };
+  SD.hh = function (v) { return (Math.round(v * 100) / 100).toFixed(2).replace('.', ','); };
+  SD.money = function (v) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽'; };
+  SD.pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  SD.clock = function (s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 3600) + ':' + SD.pad(Math.floor(s / 60) % 60) + ':' + SD.pad(s % 60); };
+  SD.tint = function (hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; };
+  SD.$ = function (sel, root) { return (root || document).querySelector(sel); };
+  SD.$$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+  SD.fmtD = function (d) { return SD.pad(d.getDate()) + '.' + SD.pad(d.getMonth() + 1) + '.' + d.getFullYear(); };
+  SD.fmtT = function (d) { return d.getHours() + ':' + SD.pad(d.getMinutes()); };
+  SD.fmtDT = function (d) { return SD.fmtD(d) + ' ' + SD.fmtT(d); };
+  SD.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* «сейчас» в прототипе: 27.10.2026 9:20 + сколько страница открыта */
+  var LOADED = Date.now();
+  SD.NOW0 = new Date(2026, 9, 27, 9, 20, 0);
+  SD.now = function () { return new Date(SD.NOW0.getTime() + (Date.now() - LOADED)); };
+
+  /* ---------- шина событий ---------- */
+  var subs = {};
+  SD.on = function (name, fn) { (subs[name] = subs[name] || []).push(fn); };
+  SD.emit = function (name, data) { (subs[name] || []).forEach(function (fn) { fn(data); }); };
+
+  /* ---------- справочники ---------- */
+  SD.ST = { 'Новая': '#4A90E2', 'На оценке': '#F2C94C', 'На согласовании': '#EC407A', 'Согласовано': '#17A2B8', 'В работе': '#F5A623', 'Вопрос к автору': '#C2185B', 'Пауза': '#90A4AE', 'На проверке': '#9013FE', 'Протестировано': '#FF8C00', 'Выполнена': '#50B83C', 'Закрыта': '#637381', 'Отменена': '#A26A6A' };
+  SD.NEXT = {
+    'Новая': ['В работе', 'На оценке', 'Отменена'],
+    'На оценке': ['На согласовании', 'В работе', 'Отменена'],
+    'На согласовании': ['Согласовано', 'Отменена'],
+    'Согласовано': ['В работе'],
+    'В работе': ['На проверке', 'Вопрос к автору', 'Пауза'],
+    'Вопрос к автору': ['В работе', 'На оценке', 'Отменена'],
+    'Пауза': ['В работе', 'Отменена'],
+    'На проверке': ['Выполнена', 'В работе'],
+    'Протестировано': ['Выполнена'],
+    'Выполнена': ['Закрыта', 'В работе'],
+    'Закрыта': ['В работе'],
+    'Отменена': ['Новая']
+  };
+  SD.NEEDS_NOTE = { 'Вопрос к автору': 'Что спросить у автора?', 'Отменена': 'Причина отмены', 'Пауза': 'Почему пауза?' };
+  SD.AV = { 'Анна Смирнова': '#DCE8FA', 'Борис Котов': '#E1F0DC', 'Даня Кузнецов': '#FFE7A3', 'Ольга Петрова': '#F8D9E6', 'Игорь Белов': '#E6E0F6', 'Денис Орлов': '#D9EEF0' };
+  SD.PEOPLE = [
+    ['Анна Смирнова', 'руководитель'], ['Борис Котов', 'исполнитель'], ['Даня Кузнецов', 'исполнитель'],
+    ['Игорь Белов', 'исполнитель'], ['Денис Орлов', 'подрядчик «Подряд-Про»']
+  ];
+  SD.IMPS = ['Обычная', 'Высокая', 'Критичная'];
+  SD.CATS = ['Ошибка', 'Консультация', 'Доработка', 'Настройка', 'Обновление'];
+  SD.ME = 'Даня Кузнецов';
+
+  /* ---------- заявка-пример ---------- */
+  SD.task = {
+    id: '21746', title: 'Ошибка при проведении реализации', client: 'ООО Альфа', author: 'Ольга Петрова', authorRole: 'заказчик',
+    assignee: 'Даня Кузнецов', status: 'Вопрос к автору', statusAt: '27.10.2026 7:09', statusBy: 'Даня Кузнецов',
+    statusNote: 'Уточните, на какой базе воспроизводится?', importance: 'Высокая', category: 'Ошибка',
+    created: '26.10.2026 9:12', due: new Date(2026, 9, 28, 18, 0), sla: 'осталось 9 ч', slaLeftH: 9, slaTotalH: 16,
+    plan: 3, fact: 1.75, rate: 3000, tags: ['склад', 'проведение'], project: 'Сопровождение ООО Альфа · октябрь',
+    desc: '<p>При проведении реализации АЛ-00412 от 26.10.2026 программа выдаёт ошибку:</p>' +
+      '<p class="d-red">Недостаточно товара «Кабель ВВГ 3×2,5» на складе «Основной»: не хватает 12 м.</p>' +
+      '<p>Что нужно сделать:</p>' +
+      '<ol><li>Найти, почему не сходится остаток — по отчёту «Остатки товаров» на складе 40 м.</li>' +
+      '<li>Исправить документы или остатки, из-за которых не хватает товара.</li>' +
+      '<li>Провести АЛ-00412 и проверить печать ТОРГ-12.</li></ol>' +
+      '<p><b>Без проведения не можем отгрузить товар и напечатать документы.</b></p>',
+    steps: ['Найти, почему не сходится остаток — по отчёту «Остатки товаров» на складе 40 м.', 'Исправить документы или остатки, из-за которых не хватает товара.', 'Провести АЛ-00412 и проверить печать ТОРГ-12.'],
+    work: [
+      { d: '26.10.2026', t: '11:20', who: 'Даня Кузнецов', h: 0.75, text: 'Воспроизвёл ошибку на копии базы, выгрузил остатки по партиям' },
+      { d: '26.10.2026', t: '15:10', who: 'Даня Кузнецов', h: 0.5, text: 'Проверил движения регистра «Товары на складах» за октябрь' },
+      { d: '27.10.2026', t: '7:05', who: 'Даня Кузнецов', h: 0.5, text: 'Сверил резервы по заказу клиента — нужен ответ, на какой базе ошибка' }
+    ],
+    history: [
+      { at: '26.10.2026 9:12', who: 'Ольга Петрова', kind: 'created', to: 'Новая', text: 'создала заявку' },
+      { at: '26.10.2026 9:40', who: 'Анна Смирнова', kind: 'assign', text: 'назначила исполнителя Даню Кузнецова и срок 28.10.2026 18:00' },
+      { at: '26.10.2026 10:05', who: 'Даня Кузнецов', kind: 'status', from: 'Новая', to: 'В работе' },
+      { at: '27.10.2026 7:09', who: 'Даня Кузнецов', kind: 'status', from: 'В работе', to: 'Вопрос к автору', note: 'Уточните, на какой базе воспроизводится?' }
+    ],
+    messages: [
+      { at: '26.10.2026 9:15', who: 'Ольга Петрова', side: 'client', text: 'Добрый день! Ошибка с сегодняшнего утра, отгрузка стоит. Скриншот ошибки приложила.', file: 0 },
+      { at: '26.10.2026 15:30', who: 'Даня Кузнецов', side: 'us', text: 'Ольга, добрый день! На копии базы ошибка повторяется. Выгрузил остатки по кабелю — проверяю партии.', file: 1 },
+      { at: '26.10.2026 16:02', who: 'Ольга Петрова', side: 'client', text: 'Спасибо! Если нужно, дадим доступ к рабочей базе.' }
+    ],
+    files: [
+      { name: 'ошибка_проведения.png', size: '184 КБ', who: 'Ольга Петрова', at: '26.10.2026 9:15', kind: 'png' },
+      { name: 'остатки_кабель_26-10.xlsx', size: '42 КБ', who: 'Даня Кузнецов', at: '26.10.2026 15:30', kind: 'xlsx' }
+    ],
+    linked: [{ id: '21702', title: 'Настроить отчёт по остаткам склада', status: 'Выполнена', client: 'ООО Альфа', rel: 'Похожая проблема' }]
+  };
+  SD.sum = function (t) { t = t || SD.task; return t.fact * t.rate; };
+
+  /* ---------- иконки ---------- */
+  function ic(w, d, extra) { return '<svg aria-hidden="true" width="' + w + '" height="' + w + '" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"' + (extra || '') + '>' + d + '</svg>'; }
+  SD.I = {
+    play: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16"><path d="M4.5 2.9v10.2a.7.7 0 0 0 1.06.6l8.1-5.1a.7.7 0 0 0 0-1.2L5.56 2.3a.7.7 0 0 0-1.06.6z" fill="currentColor"/></svg>',
+    chev: ic(12, '<path d="M4 6l4 4 4-4"/>', ' class="chev"'),
+    more: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="3.5" cy="8" r="1.4"/><circle cx="8" cy="8" r="1.4"/><circle cx="12.5" cy="8" r="1.4"/></svg>',
+    x: ic(14, '<path d="M4 4l8 8M12 4l-8 8"/>'),
+    left: ic(16, '<path d="M10 3.5L5.5 8l4.5 4.5"/>'),
+    right: ic(16, '<path d="M6 3.5l4.5 4.5L6 12.5"/>'),
+    clock: ic(14, '<circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/>'),
+    cal: ic(14, '<rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.8h11M5.5 2v3M10.5 2v3"/>'),
+    user: ic(14, '<circle cx="8" cy="5.6" r="2.6"/><path d="M3 13.5c.6-2.4 2.7-3.8 5-3.8s4.4 1.4 5 3.8"/>'),
+    clip: ic(16, '<path d="M13.2 7.6l-5 5a3.2 3.2 0 0 1-4.6-4.5l5.4-5.4a2.1 2.1 0 0 1 3 3L6.7 11a1 1 0 0 1-1.5-1.5l4.6-4.6"/>'),
+    send: ic(16, '<path d="M14 2L7 9M14 2l-4.4 12-2.6-5-5-2.6z"/>'),
+    link: ic(14, '<path d="M6.6 9.4a3 3 0 0 0 4.2 0l2-2a3 3 0 0 0-4.2-4.2l-.9.9M9.4 6.6a3 3 0 0 0-4.2 0l-2 2a3 3 0 0 0 4.2 4.2l.9-.9"/>'),
+    ext: ic(14, '<path d="M9.5 2.5h4v4M13.5 2.5L8 8M12 9.5v3a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"/>'),
+    check: ic(14, '<path d="M3.2 8.4l3 3 6.6-6.8"/>'),
+    edit: ic(14, '<path d="M10.6 2.9l2.5 2.5L6 12.5l-3.2.7.7-3.2z"/>'),
+    plus: ic(14, '<path d="M8 3v10M3 8h10"/>'),
+    hist: ic(14, '<path d="M2.6 8a5.4 5.4 0 1 0 1.6-3.8"/><path d="M2.4 2.6v2.6H5"/><path d="M8 5.2V8l2 1.2"/>'),
+    chat: ic(14, '<path d="M2.8 3.2h10.4v7.2H7.6l-3 2.4v-2.4H2.8z"/>'),
+    file: ic(14, '<path d="M4 1.8h5l3 3v9.4H4z"/><path d="M9 1.8v3h3"/>'),
+    search: ic(14, '<circle cx="7" cy="7" r="4.4"/><path d="M10.4 10.4l3.2 3.2"/>'),
+    info: ic(16, '<circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v4M8 4.9v.1"/>'),
+    print: ic(14, '<path d="M4.5 6V2.5h7V6M4.5 11.5h-2v-5h11v5h-2"/><rect x="4.5" y="9.5" width="7" height="4" rx=".5"/>'),
+    flag: ic(14, '<path d="M3.5 14V2.5M3.5 3h8l-1.6 3 1.6 3h-8"/>'),
+    bolt: ic(14, '<path d="M8.8 1.8L3.6 9h4l-.8 5.2L12 7H8z"/>'),
+    task: ic(14, '<rect x="2.5" y="2.5" width="11" height="11" rx="2.5"/><path d="M5.4 8.2l1.8 1.8 3.4-3.6"/>'),
+    star: ic(14, '<path d="M8 2.2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.4l-3.6 1.9.7-4L2.2 6.5l4-.6z"/>'),
+    stop: '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="1.8" fill="currentColor"/></svg>'
+  };
+  SD.impIcon = function (imp) {
+    var n = imp === 'Критичная' ? 3 : imp === 'Высокая' ? 2 : 1, s = '';
+    for (var i = 0; i < 3; i++) s += '<rect x="' + (2 + i * 4.6) + '" y="' + (10 - i * 3.2) + '" width="3" height="' + (3.6 + i * 3.2) + '" rx="1" fill="' + (i < n ? '#2A2A28' : '#CFCFCB') + '"/>';
+    return '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">' + s + '</svg>';
+  };
+  SD.fileIcon = function (kind, size) {
+    size = size || 36;
+    var c = kind === 'png' || kind === 'jpg' ? ['#E8F0FC', '#1F5FBF'] : kind === 'xlsx' ? ['#E3F2E6', '#1E7B34'] : ['#EFEFEC', '#5C5C58'];
+    return '<span class="fico" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;flex:none;width:' + size + 'px;height:' + size + 'px;border-radius:9px;background:' + c[0] + ';color:' + c[1] + ';font-size:' + (size > 30 ? 10 : 9) + 'px;font-weight:700;letter-spacing:.03em;text-transform:uppercase">' + SD.esc(kind) + '</span>';
+  };
+
+  /* ---------- маленькие куски разметки ---------- */
+  SD.initials = function (n) { return n.split(' ').map(function (w) { return w.charAt(0); }).join('').slice(0, 2); };
+  SD.av = function (name, cls) { return '<span class="av ' + (cls || '') + '" aria-hidden="true" style="background:' + (SD.AV[name] || '#E6E6E3') + '">' + SD.esc(SD.initials(name)) + '</span>'; };
+  SD.pillStyle = function (st) { var c = SD.ST[st] || '#90A4AE'; return 'background:' + SD.tint(c, 0.13) + ';box-shadow:inset 0 0 0 1px ' + SD.tint(c, 0.32); };
+  SD.dot = function (st, size) { return '<i class="dot" aria-hidden="true" style="background:' + (SD.ST[st] || '#90A4AE') + (size ? ';width:' + size + 'px;height:' + size + 'px' : '') + '"></i>'; };
+  SD.pill = function (st, extraCls) { return '<span class="st ' + (extraCls || '') + '" style="' + SD.pillStyle(st) + '">' + SD.dot(st) + SD.esc(st) + '</span>'; };
+  SD.pillBtn = function (st, cls, attrs) {
+    return '<button type="button" class="st st-btn ' + (cls || '') + '" style="' + SD.pillStyle(st) + '" aria-haspopup="menu" aria-expanded="false" ' + (attrs || '') + '>' + SD.dot(st) + '<span>' + SD.esc(st) + '</span>' + SD.I.chev + '<span class="sr">, изменить статус</span></button>';
+  };
+  SD.tags = function (tags) { return tags.map(function (t) { return '<span class="tag">' + SD.esc(t) + '</span>'; }).join(''); };
+  SD.timerBtn = function (cls, taskId, idle) {
+    return '<button type="button" class="btn btn-lg btn-y tbtn js-timer ' + (cls || '') + '" data-task="' + SD.esc(taskId || SD.task.id) + '"' + (idle ? ' data-idle="' + SD.esc(idle) + '"' : '') + '>' +
+      '<span class="tb-ic">' + SD.I.play + '</span><span class="tb-rec" aria-hidden="true"></span><span class="tb-l">' + SD.esc(idle || 'Начать работу') + '</span><span class="tb-t"></span></button>';
+  };
+  SD.dueText = function (d) {
+    var n = SD.now(), a = new Date(n.getFullYear(), n.getMonth(), n.getDate()), b = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var days = Math.round((b - a) / 86400000);
+    var w = days === 0 ? 'сегодня' : days === 1 ? 'завтра' : days === 2 ? 'послезавтра' : days < 0 ? 'просрочено' : 'через ' + days + ' дн.';
+    return { full: SD.fmtDT(d), word: w, time: SD.fmtT(d) };
+  };
+
+  /* ---------- мост в 1С: #do|действие|ключ ---------- */
+  SD.call1C = function (action, key) {
+    var cmd = '#do|' + action + '|' + key;
+    SD.$$('.js-bridge').forEach(function (el) { el.textContent = cmd; });
+    SD.lastCmd = cmd;
+    return cmd;
+  };
+
+  /* ---------- уведомления ---------- */
+  var toasts;
+  SD.toast = function (msg, cmd) {
+    if (!toasts) { toasts = document.createElement('div'); toasts.className = 'toasts'; toasts.setAttribute('role', 'status'); toasts.setAttribute('aria-live', 'polite'); document.body.appendChild(toasts); }
+    var t = document.createElement('div'); t.className = 'toast';
+    t.innerHTML = '<span>' + SD.esc(msg) + '</span>' + (cmd ? '<code>' + SD.esc(cmd) + '</code>' : '');
+    toasts.appendChild(t);
+    while (toasts.children.length > 3) toasts.removeChild(toasts.firstChild);
+    setTimeout(function () { t.classList.add('out'); setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 220); }, 3400);
+  };
+
+  /* ---------- выпадающее меню ---------- */
+  var openMenu = null;
+  function closeMenu(focusAnchor) {
+    if (!openMenu) return;
+    var m = openMenu; openMenu = null;
+    if (m.el.parentNode) m.el.parentNode.removeChild(m.el);
+    m.anchor.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('mousedown', m.outside, true);
+    window.removeEventListener('scroll', m.onScroll, true);
+    window.removeEventListener('resize', m.onResize);
+    if (focusAnchor && document.body.contains(m.anchor)) m.anchor.focus({ preventScroll: true });
+  }
+  SD.closeMenu = closeMenu;
+  SD.menu = function (anchor, cfg) {
+    if (openMenu && openMenu.anchor === anchor) { closeMenu(true); return; }
+    closeMenu(false);
+    var el = document.createElement('div');
+    el.className = 'menu'; el.setAttribute('role', 'menu');
+    if (cfg.label) el.setAttribute('aria-label', cfg.label);
+    if (cfg.width) el.style.width = cfg.width + 'px';
+    var html = '';
+    cfg.items.forEach(function (it, i) {
+      if (it.sep) { html += '<div class="menu-sep" role="separator"></div>'; return; }
+      if (it.head) { html += '<div class="menu-h" role="presentation">' + SD.esc(it.head) + '</div>'; return; }
+      var hasCk = it.check !== undefined;
+      var role = hasCk ? (cfg.multi ? 'menuitemcheckbox' : 'menuitemradio') : 'menuitem';
+      html += '<button type="button" class="mi" role="' + role + '" tabindex="-1" data-i="' + i + '"' + (hasCk ? ' aria-checked="' + (!!it.check) + '"' : '') + '>' +
+        (it.icon || '') + '<span>' + SD.esc(it.label) + '</span>' + (it.hint ? '<span class="mi-h">' + SD.esc(it.hint) + '</span>' : '') +
+        (hasCk ? '<span class="mi-ck' + (it.check ? '' : ' off') + '" aria-hidden="true">✓</span>' : '') + '</button>';
+    });
+    el.innerHTML = html;
+    document.body.appendChild(el);
+    var r = anchor.getBoundingClientRect(), mw = el.offsetWidth, mh = el.offsetHeight;
+    var left = cfg.alignRight ? r.right - mw : r.left;
+    left = Math.max(8, Math.min(left, window.innerWidth - mw - 8));
+    var top = r.bottom + 6;
+    if (top + mh > window.innerHeight - 8 && r.top - mh - 6 > 8) top = r.top - mh - 6;
+    el.style.left = left + 'px'; el.style.top = Math.max(8, top) + 'px';
+    anchor.setAttribute('aria-expanded', 'true');
+    var items = SD.$$('.mi', el);
+    var start = items.filter(function (b) { return b.getAttribute('aria-checked') === 'true'; })[0] || items[0];
+    if (start) start.focus({ preventScroll: true });
+    var m = { el: el, anchor: anchor };
+    m.outside = function (e) { if (!el.contains(e.target) && !anchor.contains(e.target)) closeMenu(false); };
+    m.onScroll = function (e) { if (!el.contains(e.target)) closeMenu(false); };
+    m.onResize = function () { closeMenu(false); };
+    document.addEventListener('mousedown', m.outside, true);
+    window.addEventListener('scroll', m.onScroll, true);
+    window.addEventListener('resize', m.onResize);
+    el.addEventListener('keydown', function (e) {
+      var i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeMenu(true); }
+      else if (e.key === 'Tab') { e.preventDefault(); closeMenu(true); }
+    });
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('.mi'); if (!b) return;
+      var it = cfg.items[+b.getAttribute('data-i')];
+      if (cfg.multi) {
+        it.check = !it.check; b.setAttribute('aria-checked', String(it.check));
+        b.querySelector('.mi-ck').classList.toggle('off', !it.check);
+        cfg.onPick(it); return;
+      }
+      closeMenu(true);
+      cfg.onPick(it);
+    });
+    openMenu = m;
+  };
+
+  /* ---------- простой диалог (в 1С — штатный ввод строки) ---------- */
+  var dlg = null;
+  SD.ask = function (cfg, cb) {
+    var prev = document.activeElement;
+    var back = document.createElement('div');
+    back.className = 'mback';
+    var tid = 'dlg' + Date.now();
+    back.innerHTML = '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="' + tid + '">' +
+      '<h2 id="' + tid + '">' + SD.esc(cfg.title) + '</h2>' + (cfg.sub ? '<p class="m-sub">' + SD.esc(cfg.sub) + '</p>' : '') +
+      (cfg.timer ? '<div class="m-time"><span class="tb-rec" aria-hidden="true"></span><span>Время работы</span><b class="js-dlg-clock">' + SD.clock(SD.timer.sec()) + '</b><span class="js-dlg-h" style="margin-left:auto"></span></div>' : '') +
+      (cfg.prefix || '') +
+      '<label for="' + tid + 't">' + SD.esc(cfg.label || 'Комментарий') + '</label>' +
+      '<textarea id="' + tid + 't" rows="4" placeholder="' + SD.esc(cfg.placeholder || '') + '" aria-describedby="' + tid + 'e"></textarea>' +
+      '<div class="m-err" id="' + tid + 'e" aria-live="polite"></div>' +
+      '<div class="m-acts"><button type="button" class="btn btn-lg js-no">' + SD.esc(cfg.cancel || 'Отмена') + '</button>' +
+      '<button type="button" class="btn btn-lg ' + (cfg.okCls || 'btn-y') + ' js-ok">' + SD.esc(cfg.ok || 'Готово') + '</button></div>' +
+      (cfg.note ? '<p class="m-note">' + cfg.note + '</p>' : '') + '</div>';
+    document.body.appendChild(back);
+    var ta = SD.$('textarea', back), err = SD.$('.m-err', back);
+    if (cfg.value) ta.value = cfg.value;
+    dlg = back;
+    SD.timer.paint(false);
+    setTimeout(function () { ta.focus(); }, 30);
+    function done(val) {
+      if (!back.parentNode) return;
+      back.parentNode.removeChild(back); dlg = null;
+      if (prev && document.body.contains(prev)) prev.focus({ preventScroll: true });
+      cb(val);
+    }
+    function ok() {
+      var v = ta.value.trim();
+      if (cfg.required && !v) { ta.setAttribute('aria-invalid', 'true'); err.textContent = cfg.requiredText || 'Напишите пару слов — это попадёт в трудозатраты.'; ta.focus(); return; }
+      done(v);
+    }
+    ta.addEventListener('input', function () { if (ta.value.trim()) { ta.removeAttribute('aria-invalid'); err.textContent = ''; } });
+    SD.$('.js-ok', back).addEventListener('click', ok);
+    SD.$('.js-no', back).addEventListener('click', function () { done(null); });
+    back.addEventListener('mousedown', function (e) { if (e.target === back) done(null); });
+    back.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(null); }
+      else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ok(); }
+      else if (e.key === 'Tab') {
+        var f = SD.$$('textarea,button', back), i = f.indexOf(document.activeElement);
+        if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+      }
+    });
+  };
+
+  /* ---------- таймер работы ---------- */
+  var TM = SD.timer = { run: null, t0: 0 };
+  TM.sec = function () { return TM.run ? Math.max(0, Math.floor((Date.now() - TM.t0) / 1000)) : 0; };
+  TM.round = function (sec) { var mins = Math.max(1, Math.ceil(sec / 60)); return { mins: mins, h: Math.round(mins / 60 * 100) / 100 }; };
+  TM.paint = function (flip) {
+    var s = TM.sec(), txt = SD.clock(s);
+    SD.$$('.js-timer').forEach(function (b) {
+      var on = TM.run === b.getAttribute('data-task');
+      if (b._on !== on) {
+        b._on = on;
+        b.classList.toggle('is-run', on);
+        b.querySelector('.tb-l').textContent = on ? 'Завершить работу' : (b.getAttribute('data-idle') || 'Начать работу');
+        if (flip && !SD.reduced) { b.classList.remove('flip'); void b.offsetWidth; b.classList.add('flip'); }
+      }
+      if (on) { var t = b.querySelector('.tb-t'); if (t.textContent !== txt) t.textContent = txt; }
+    });
+    SD.$$('.js-run-clock').forEach(function (el) { el.textContent = txt; });
+    if (dlg) {
+      var c = SD.$('.js-dlg-clock', dlg), hh = SD.$('.js-dlg-h', dlg);
+      if (c) c.textContent = txt;
+      if (hh) hh.textContent = 'спишется ' + SD.hh(TM.round(s).h) + ' ч';
+    }
+  };
+  TM.start = function (id) {
+    TM.run = id; TM.t0 = Date.now();
+    TM.paint(true);
+    SD.toast('Таймер запущен — №' + id, SD.call1C('start', id));
+    SD.emit('timer', { type: 'start', id: id });
+  };
+  TM.finish = function (id, cb, note) {
+    var t = SD.taskById ? SD.taskById(id) : SD.task;
+    SD.ask({
+      title: 'Что сделано по заявке?', sub: '№' + id + ' · ' + (t ? t.title : ''), timer: true,
+      label: note || 'Что сделано', placeholder: 'Например: нашёл документ, из-за которого не хватает остатка',
+      ok: 'Завершить и списать', okCls: 'btn-k', cancel: 'Продолжить работу', required: true,
+      note: 'В 1С это штатный диалог ввода — текст попадёт в трудозатраты.'
+    }, function (text) {
+      if (text === null) { if (cb) cb(false); return; }
+      var sec = TM.sec(), r = TM.round(sec);
+      TM.run = null;
+      TM.paint(true);
+      var rec = { id: id, sec: sec, mins: r.mins, h: r.h, text: text };
+      SD.toast('Списано ' + SD.hh(r.h) + ' ч по №' + id, SD.call1C('stop', id));
+      SD.emit('timer', { type: 'stop', id: id, rec: rec });
+      if (cb) cb(true);
+    });
+  };
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.js-timer');
+    if (!b) return;
+    var id = b.getAttribute('data-task');
+    if (TM.run === id) TM.finish(id);
+    else if (TM.run) TM.finish(TM.run, function (ok) { if (ok) TM.start(id); }, 'Сначала закроем работу по №' + TM.run + ': что сделано?');
+    else TM.start(id);
+  });
+  setInterval(function () { if (TM.run) TM.paint(false); SD.emit('tick'); }, 500);
+
+  /* ---------- сегменты (radiogroup) и вкладки (tablist) ---------- */
+  SD.seg = function (group, onChange) {
+    var btns = SD.$$('[role=radio]', group);
+    function set(b, focus) {
+      btns.forEach(function (x) { var on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+      if (focus) b.focus();
+      onChange(b.getAttribute('data-v'), b);
+    }
+    btns.forEach(function (b) {
+      b.tabIndex = b.getAttribute('aria-checked') === 'true' ? 0 : -1;
+      b.addEventListener('click', function () { set(b); });
+      b.addEventListener('keydown', function (e) {
+        var i = btns.indexOf(b), n = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = btns[(i + 1) % btns.length];
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = btns[(i - 1 + btns.length) % btns.length];
+        if (n) { e.preventDefault(); set(n, true); }
+      });
+    });
+    return { set: function (v) { var b = btns.filter(function (x) { return x.getAttribute('data-v') === v; })[0]; if (b) set(b); } };
+  };
+  SD.tabs = function (list, onChange) {
+    var tabs = SD.$$('[role=tab]', list);
+    function sel(t, focus) {
+      tabs.forEach(function (x) {
+        var on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1;
+        var p = document.getElementById(x.getAttribute('aria-controls')); if (p) p.hidden = !on;
+      });
+      if (focus) t.focus();
+      if (onChange) onChange(t.getAttribute('data-v'), t);
+    }
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () { sel(t); });
+      t.addEventListener('keydown', function (e) {
+        var i = tabs.indexOf(t), n = null;
+        if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
+        else if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
+        else if (e.key === 'Home') n = tabs[0];
+        else if (e.key === 'End') n = tabs[tabs.length - 1];
+        if (n) { e.preventDefault(); sel(n, true); }
+      });
+    });
+    return { select: function (v) { var t = tabs.filter(function (x) { return x.getAttribute('data-v') === v; })[0]; if (t) sel(t); } };
+  };
+
+  /* ---------- «Смотреть как»: исполнитель / руководитель ---------- */
+  SD.role = function (def) {
+    var host = SD.$('.js-role');
+    document.body.classList.add(def === 'mgr' ? 'role-mgr' : 'role-exec');
+    if (!host) return;
+    host.innerHTML = '<span>Смотреть как</span><div class="seg" role="radiogroup" aria-label="Смотреть как">' +
+      '<button type="button" role="radio" data-v="exec" aria-checked="' + (def !== 'mgr') + '">Исполнитель</button>' +
+      '<button type="button" role="radio" data-v="mgr" aria-checked="' + (def === 'mgr') + '">Руководитель</button></div>';
+    host.style.display = 'inline-flex'; host.style.alignItems = 'center'; host.style.gap = '8px';
+    SD.seg(SD.$('.seg', host), function (v) {
+      document.body.classList.toggle('role-mgr', v === 'mgr');
+      document.body.classList.toggle('role-exec', v !== 'mgr');
+      SD.emit('role', v);
+    });
+  };
+
+  /* ---------- общие действия с заявкой ---------- */
+  SD.setStatus = function (to, t) {
+    t = t || SD.task;
+    function apply(note) {
+      var from = t.status, at = SD.fmtDT(SD.now());
+      t.status = to; t.statusAt = at; t.statusBy = SD.ME; t.statusNote = note || '';
+      t.history.push({ at: at, who: SD.ME, kind: 'status', from: from, to: to, note: note || '', fresh: true });
+      SD.toast('Статус: ' + to, SD.call1C('status', to));
+      SD.emit('status', { t: t, from: from, to: to, note: note });
+    }
+    if (SD.NEEDS_NOTE[to]) {
+      SD.ask({ title: SD.NEEDS_NOTE[to], sub: '№' + t.id + ' · ' + t.status + ' → ' + to, label: 'Комментарий к переходу', ok: 'Перевести', required: true, requiredText: 'Для этого перехода нужен комментарий.', placeholder: to === 'Отменена' ? 'Например: клиент решил вопрос сам' : '' },
+        function (v) { if (v !== null) apply(v); });
+    } else apply('');
+  };
+  SD.statusMenu = function (anchor, t) {
+    t = t || SD.task;
+    var next = SD.NEXT[t.status] || [];
+    SD.menu(anchor, {
+      label: 'Перевести в статус', width: 250,
+      items: [{ head: 'Сейчас: ' + t.status }].concat(next.map(function (s) { return { label: s, v: s, icon: SD.dot(s, 10), hint: SD.NEEDS_NOTE[s] ? 'с комментарием' : '' }; })),
+      onPick: function (it) { SD.setStatus(it.v, t); }
+    });
+  };
+  SD.assigneeMenu = function (anchor, t) {
+    t = t || SD.task;
+    SD.menu(anchor, {
+      label: 'Исполнитель', width: 290,
+      items: [{ head: 'Исполнитель' }].concat(SD.PEOPLE.map(function (p) { return { label: p[0], v: p[0], hint: p[1], check: t.assignee === p[0], icon: SD.av(p[0], 'av-sm') }; })),
+      onPick: function (it) {
+        if (it.v === t.assignee) return;
+        t.assignee = it.v;
+        t.history.push({ at: SD.fmtDT(SD.now()), who: SD.ME, kind: 'assign', text: 'назначил исполнителя: ' + it.v, fresh: true });
+        SD.toast('Исполнитель: ' + it.v, SD.call1C('assign', it.v));
+        SD.emit('change', 'assignee');
+      }
+    });
+  };
+  SD.dueMenu = function (anchor, t) {
+    t = t || SD.task;
+    var n = SD.now();
+    var today = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 18, 0), tom = new Date(today.getTime() + 86400000);
+    SD.menu(anchor, {
+      label: 'Срок', width: 270,
+      items: [{ head: 'Срок · сейчас ' + SD.fmtDT(t.due) },
+        { label: 'Сегодня до 18:00', v: today, hint: SD.fmtD(today), icon: SD.I.cal },
+        { label: 'Завтра до 18:00', v: tom, hint: SD.fmtD(tom), icon: SD.I.cal },
+        { label: '+1 час', v: new Date(t.due.getTime() + 3600000), hint: SD.fmtT(new Date(t.due.getTime() + 3600000)), icon: SD.I.clock },
+        { label: '+1 день', v: new Date(t.due.getTime() + 86400000), hint: SD.fmtD(new Date(t.due.getTime() + 86400000)), icon: SD.I.clock },
+        { sep: true }, { label: 'Другая дата…', v: 'pick', hint: 'календарь 1С', icon: SD.I.cal }],
+      onPick: function (it) {
+        if (it.v === 'pick') { SD.toast('1С откроет выбор даты', SD.call1C('due', 'pick')); return; }
+        t.due = it.v;
+        t.history.push({ at: SD.fmtDT(SD.now()), who: SD.ME, kind: 'assign', text: 'перенёс срок на ' + SD.fmtDT(it.v), fresh: true });
+        SD.toast('Срок: ' + SD.fmtDT(it.v), SD.call1C('due', SD.fmtDT(it.v)));
+        SD.emit('change', 'due');
+      }
+    });
+  };
+  SD.listMenu = function (anchor, field, list, title, t) {
+    t = t || SD.task;
+    SD.menu(anchor, {
+      label: title, width: 220,
+      items: [{ head: title }].concat(list.map(function (v) { return { label: v, v: v, check: t[field] === v, icon: field === 'importance' ? SD.impIcon(v) : '' }; })),
+      onPick: function (it) { if (t[field] === it.v) return; t[field] = it.v; SD.toast(title + ': ' + it.v, SD.call1C(field, it.v)); SD.emit('change', field); }
+    });
+  };
+  SD.tagMenu = function (anchor, t) {
+    t = t || SD.task;
+    var all = ['склад', 'проведение', 'остатки', 'печать', 'обмен', 'срочно'];
+    SD.menu(anchor, {
+      label: 'Теги', width: 220, multi: true,
+      items: [{ head: 'Теги' }].concat(all.map(function (v) { return { label: v, v: v, check: t.tags.indexOf(v) >= 0 }; })),
+      onPick: function (it) {
+        if (it.check) t.tags.push(it.v); else t.tags = t.tags.filter(function (x) { return x !== it.v; });
+        SD.call1C('tag', it.v); SD.emit('change', 'tags');
+      }
+    });
+  };
+  SD.moreMenu = function (anchor, t) {
+    t = t || SD.task;
+    var acts = [
+      ['form', 'Открыть обычную форму', SD.I.ext], ['print', 'Печать', SD.I.print], ['link', 'Скопировать ссылку', SD.I.link],
+      ['relate', 'Связать с заявкой…', SD.I.task], ['attach', 'Добавить файл…', SD.I.clip], ['worklog', 'Списать время вручную…', SD.I.clock]
+    ];
+    SD.menu(anchor, {
+      label: 'Ещё действия', width: 250, alignRight: true,
+      items: acts.map(function (a) { return { label: a[1], v: a[0], icon: a[2] }; }),
+      onPick: function (it) { SD.toast(it.label.replace('…', '') + ' — выполнит 1С', SD.call1C(it.v, t.id)); }
+    });
+  };
+  /* ссылки #do|… в прототипе перехватываются так же, как их перехватит форма 1С */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#do|"]');
+    if (!a) return;
+    e.preventDefault();
+    var p = a.getAttribute('href').split('|');
+    SD.toast(a.getAttribute('data-msg') || 'Выполнит 1С', SD.call1C(p[1], p.slice(2).join('|')));
+  });
+  /* иконки и аватары в статической разметке: <i data-ic="clock"></i>, <i data-av="Имя"></i> */
+  SD.fill = function (root) {
+    SD.$$('i[data-ic]', root).forEach(function (el) { var t = document.createElement('span'); t.innerHTML = SD.I[el.getAttribute('data-ic')] || ''; el.parentNode.replaceChild(t.firstChild || t, el); });
+    SD.$$('i[data-av]', root).forEach(function (el) { var t = document.createElement('span'); t.innerHTML = SD.av(el.getAttribute('data-av'), el.getAttribute('data-cls') || ''); el.parentNode.replaceChild(t.firstChild, el); });
+  };
+  SD.openFile = function (f) { SD.toast('Открыть «' + f.name + '» — 1С', SD.call1C('file', f.name)); };
+  SD.openTask = function (id) { SD.toast('Открыть заявку №' + id + ' — 1С', SD.call1C('open', id)); };
+  SD.addWork = function (rec, t) {
+    t = t || SD.task;
+    var n = SD.now();
+    var w = { d: SD.fmtD(n), t: SD.fmtT(n), who: SD.ME, h: rec.h, text: rec.text, fresh: true };
+    t.work.push(w); t.fact = Math.round((t.fact + rec.h) * 100) / 100;
+    return w;
+  };
+})();
+
+(function () {
+  'use strict';
+  var T = SD.task, $ = SD.$, $$ = SD.$$, esc = SD.esc, I = SD.I;
+  var FEM = { 'Анна Смирнова': 1, 'Ольга Петрова': 1 };
+  SD.role('exec');
+  SD.fill();
+  $('.js-timer-slot').outerHTML = SD.timerBtn('', T.id);
+  function navH() { var n = document.getElementById('pnav'); document.documentElement.style.setProperty('--navh', (n ? n.offsetHeight : 56) + 'px'); }
+  navH(); window.addEventListener('resize', navH);
+
+  /* события ленты */
+  var EV = [
+    { at: '26.10.2026 9:12', type: 'status', who: 'Ольга Петрова', to: 'Новая', created: true },
+    { at: '26.10.2026 9:15', type: 'msg', m: T.messages[0] },
+    { at: '26.10.2026 9:15', type: 'file', f: T.files[0], who: 'Ольга Петрова' },
+    { at: '26.10.2026 9:40', type: 'other', who: 'Анна Смирнова', text: 'назначила исполнителя <b>Даню Кузнецова</b> и срок <b>28.10.2026 18:00</b>' },
+    { at: '26.10.2026 10:05', type: 'status', who: 'Даня Кузнецов', from: 'Новая', to: 'В работе' },
+    { at: '26.10.2026 11:20', type: 'work', w: T.work[0] },
+    { at: '26.10.2026 11:25', type: 'other', who: 'Даня Кузнецов', link: T.linked[0] },
+    { at: '26.10.2026 15:10', type: 'work', w: T.work[1] },
+    { at: '26.10.2026 15:30', type: 'msg', m: T.messages[1] },
+    { at: '26.10.2026 15:30', type: 'file', f: T.files[1], who: 'Даня Кузнецов' },
+    { at: '26.10.2026 16:02', type: 'msg', m: T.messages[2] },
+    { at: '27.10.2026 7:05', type: 'work', w: T.work[2] },
+    { at: '27.10.2026 7:09', type: 'status', who: 'Даня Кузнецов', from: 'В работе', to: 'Вопрос к автору', note: 'Уточните, на какой базе воспроизводится?' }
+  ];
+  var TYPES = [['all', 'Все события', I.hist], ['status', 'Статусы', I.flag], ['msg', 'Сообщения', I.chat], ['work', 'Трудозатраты', I.clock], ['file', 'Файлы', I.file], ['other', 'Прочее', I.user]];
+  var filter = 'all', sort = 'asc';
+  var DAYS = { '26.10.2026': ['Понедельник, 26 октября', 'вчера'], '27.10.2026': ['Вторник, 27 октября', 'сегодня'] };
+
+  function key(at) { var m = at.match(/(\d+)\.(\d+)\.(\d+) (\d+):(\d+)/); return +(m[3] + m[2] + m[1] + SD.pad(+m[4]) + m[5]); }
+  function verb(who, m, f) { return FEM[who] ? f : m; }
+  function dur(fromAt) {
+    var m = fromAt.match(/(\d+)\.(\d+)\.(\d+) (\d+):(\d+)/), d = new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]);
+    var mins = Math.max(0, Math.floor((SD.now() - d) / 60000)), h = Math.floor(mins / 60);
+    return (h ? h + ' ч ' : '') + (mins % 60) + ' мин';
+  }
+
+  /* карточка сути */
+  function renderSum() {
+    var d = SD.dueText(T.due);
+    $('.js-imp').innerHTML = SD.impIcon(T.importance) + ' ' + esc(T.importance);
+    $('.js-imp').style.display = 'inline-flex'; $('.js-imp').style.alignItems = 'center'; $('.js-imp').style.gap = '5px';
+    $('.js-cat').textContent = T.category;
+    $('.js-assignee').innerHTML = SD.av(T.assignee, 'av-sm') + esc(T.assignee) + ' <small>исполнитель</small>';
+    $('.js-chips').innerHTML = SD.pillBtn(T.status, 'js-st2') +
+      '<span class="chip">' + I.cal + 'Срок <b class="num">' + esc(d.full) + '</b> · ' + esc(d.word) + '</span>' +
+      '<span class="chip">' + I.clock + 'SLA: <b>' + esc(T.sla) + '</b></span>' + SD.tags(T.tags);
+    var p = Math.min(100, Math.round(T.fact / T.plan * 100)), run = SD.timer.run === T.id;
+    $('.js-pf').innerHTML = '<div class="r"><span>План / факт</span><span><b>' + SD.h(T.fact) + '</b> из ' + SD.h(T.plan) + ' ч</span></div>' +
+      '<div class="pbar" role="progressbar" aria-label="Факт из плана" aria-valuemin="0" aria-valuemax="' + T.plan + '" aria-valuenow="' + T.fact + '"><i style="width:' + p + '%"></i></div>' +
+      '<div class="s">' + p + '% · осталось ' + SD.h(Math.max(0, T.plan - T.fact)) + ' ч' + (run ? ' · идёт <span class="js-run-clock num">' + SD.clock(SD.timer.sec()) + '</span>' : '') + '</div>';
+    $('.js-money').innerHTML = '<span>Сумма клиенту <span class="mgr-badge">руководитель</span></span><b>' + SD.money(SD.sum()) + '</b>';
+  }
+
+  /* лента */
+  function bodyHTML(e) {
+    var who = '<b>' + esc(e.who || (e.m && e.m.who) || (e.w && e.w.who) || '') + '</b> ';
+    if (e.type === 'status' && e.created) return who + verb(e.who, 'создал', 'создала') + ' заявку ' + SD.pill('Новая');
+    if (e.type === 'status') return who + verb(e.who, 'сменил', 'сменила') + ' статус ' + SD.pill(e.from) + '<span class="arr" aria-label="на">→</span>' + SD.pill(e.to) +
+      (e.note ? '<div class="quote" style="--c:' + SD.ST[e.to] + '">' + esc(e.note) + '</div>' : '');
+    if (e.type === 'msg') return who + '<span>' + (e.m.side === 'client' ? 'заказчик' : 'исполнитель') + (e.m.internal ? ' · внутренний' : '') + '</span><div class="bubble' + (e.m.side === 'us' ? ' us' : '') + '">' + esc(e.m.text) + '</div>';
+    if (e.type === 'work') return '<div class="wk">' + who.replace(/ $/, '') + '<span>' + verb(e.w.who, 'списал', 'списала') + '</span><span class="h">' + SD.hh(e.w.h) + ' ч</span><span class="tx">' + esc(e.w.text) + '</span></div>';
+    if (e.type === 'file') return who + verb(e.who, 'приложил', 'приложила') + ' файл<br><a class="fcard" href="#do|file|' + esc(e.f.name) + '" data-msg="1С откроет файл">' + SD.fileIcon(e.f.kind, 34) + '<span><span class="fn">' + esc(e.f.name) + '</span><span class="fm">' + esc(e.f.size) + '</span></span></a>';
+    if (e.link) return who + 'связал с заявкой <a href="#do|open|' + e.link.id + '" data-msg="1С откроет заявку">№' + e.link.id + ' · ' + esc(e.link.title) + '</a> ' + SD.pill(e.link.status) + ' <span>— ' + esc(e.link.rel.toLowerCase()) + '</span>';
+    return who + e.text;
+  }
+  function nodeHTML(e) {
+    if (e.type === 'status') return '<span class="node st" style="--c:' + SD.ST[e.to] + '">' + (e.created ? I.plus : I.flag) + '</span>';
+    if (e.type === 'work') return '<span class="node work">' + I.clock + '</span>';
+    if (e.type === 'file') return '<span class="node file">' + I.file + '</span>';
+    if (e.type === 'msg') return '<span class="node msg">' + SD.av(e.m.who, 'av-sm') + '</span>';
+    return '<span class="node">' + (e.link ? I.link : I.user) + '</span>';
+  }
+  function nowHTML() {
+    var st = T.status, c = SD.ST[st], isQ = st === 'Вопрос к автору', h;
+    if (isQ) h = '<b>Ждём ответа автора</b> · уже <span class="js-wait">' + dur(T.statusAt) + '</span>. Ольга Петрова получила вопрос на почту.';
+    else h = '<b>' + esc(st) + '</b> · с ' + esc(T.statusAt.split(' ')[1]) + ' · ' + esc(T.statusBy);
+    return '<li class="it now" style="--c:' + c + '"><span class="tm">Сейчас</span><span class="node">' + (isQ ? '?' : I.flag) + '</span><div class="body"><div class="now-card">' +
+      '<p class="now-t">' + h + '</p>' +
+      '<div class="now-acts">' + (isQ ? '<button type="button" class="btn btn-sm btn-o js-back">Вернуть в работу</button><a class="btn btn-sm btn-g" href="#do|remind|21746" data-msg="1С отправит напоминание автору">Напомнить автору</a>' : '') + '</div>' +
+      '<form class="cmp js-cmp"><label class="sr" for="cmpT">Сообщение в ленту</label><textarea id="cmpT" rows="1" placeholder="Написать Ольге Петровой… (Ctrl+Enter)"></textarea><button type="submit" class="btn" aria-label="Отправить">' + I.send + '</button></form>' +
+      '</div></div></li>';
+  }
+  function renderFeed(freshFocus) {
+    var draft = $('#cmpT') ? $('#cmpT').value : '';
+    var list = EV.map(function (e, i) { return { e: e, k: key(e.at), i: i }; });
+    list.sort(function (a, b) { return (a.k - b.k || a.i - b.i) * (sort === 'asc' ? 1 : -1); });
+    var groups = [], cur = null;
+    list.forEach(function (x) { var d = x.e.at.split(' ')[0]; if (!cur || cur.d !== d) { cur = { d: d, items: [] }; groups.push(cur); } cur.items.push(x.e); });
+    var html = sort === 'desc' ? '<ol class="ev">' + nowHTML() + '</ol>' : '';
+    groups.forEach(function (g) {
+      var vis = g.items.filter(function (e) { return filter === 'all' || e.type === filter; }).length;
+      var dn = DAYS[g.d] || [g.d, ''];
+      html += '<h3 class="day"' + (vis ? '' : ' hidden') + '>' + esc(dn[0]) + ' <span>' + esc(dn[1]) + '</span></h3><ol class="ev">' + g.items.map(function (e) {
+        var li = '<li class="it' + (e.fresh ? ' fresh' : '') + '" data-t="' + e.type + '"' + (filter === 'all' || e.type === filter ? '' : ' hidden') + '><span class="tm">' + esc(e.at.split(' ')[1]) + '</span>' + nodeHTML(e) + '<div class="body">' + bodyHTML(e) + '</div></li>';
+        return li;
+      }).join('') + '</ol>';
+    });
+    if (sort === 'asc') html += '<ol class="ev">' + nowHTML() + '</ol>';
+    $('.js-feed').innerHTML = html;
+    var fresh = $('.it.fresh');
+    EV.forEach(function (e) { e.fresh = false; });
+    if (draft) $('#cmpT').value = draft;
+    updSend();
+    if (fresh && freshFocus !== false) fresh.scrollIntoView({ block: 'nearest', behavior: SD.reduced ? 'auto' : 'smooth' });
+    renderRail();
+  }
+  function renderRail() {
+    var cnt = { all: EV.length };
+    EV.forEach(function (e) { cnt[e.type] = (cnt[e.type] || 0) + 1; });
+    var host = $('.js-flt');
+    if (!host.children.length) {
+      host.innerHTML = TYPES.map(function (t) { return '<button type="button" role="radio" data-v="' + t[0] + '" aria-checked="' + (t[0] === filter) + '"><span class="fi" aria-hidden="true">' + t[2] + '</span>' + t[1] + '<span class="n" data-n="' + t[0] + '"></span></button>'; }).join('');
+      SD.seg(host, function (v) { filter = v; renderFeed(false); });
+    }
+    $$('[data-n]', host).forEach(function (n) { n.textContent = cnt[n.getAttribute('data-n')] || 0; });
+    $('.js-life').innerHTML = 'Создана <b>26.10 9:12</b><br>В работе: <b>' + SD.h(T.fact) + ' ч</b> из ' + SD.h(T.plan) + '<br>Событий: <b>' + EV.length + '</b> · сообщений: <b>' + (cnt.msg || 0) + '</b>';
+  }
+  function add(e) { e.at = SD.fmtDT(SD.now()); e.fresh = true; EV.push(e); renderFeed(); }
+
+  /* описание: свернуть до 4 строк */
+  var dbox = $('.js-dbox'), clip = $('.js-dclip'), more = $('.js-dmore');
+  more.addEventListener('click', function () {
+    var open = !dbox.classList.contains('open');
+    clip.style.maxHeight = open ? clip.scrollHeight + 'px' : '';
+    dbox.classList.toggle('open', open);
+    more.setAttribute('aria-expanded', String(open));
+    more.querySelector('span').textContent = open ? 'Свернуть' : 'Показать всё';
+  });
+
+  /* события */
+  function updSend() { var t = $('#cmpT'), b = $('.js-cmp .btn'); if (t && b) b.classList.toggle('ready', !!t.value.trim()); }
+  document.addEventListener('click', function (e) {
+    var st = e.target.closest('.js-st, .js-st2');
+    if (st) { SD.statusMenu(st); return; }
+    if (e.target.closest('.js-back')) { SD.setStatus('В работе'); return; }
+    if (e.target.closest('.js-reply')) {
+      if (sort === 'desc') { /* композер наверху */ }
+      var t = $('#cmpT'); t.scrollIntoView({ block: 'center', behavior: SD.reduced ? 'auto' : 'smooth' }); t.focus({ preventScroll: true });
+    }
+  });
+  document.addEventListener('input', function (e) { if (e.target.id === 'cmpT') updSend(); });
+  document.addEventListener('keydown', function (e) { if (e.target.id === 'cmpT' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); } });
+  document.addEventListener('submit', function (e) { if (e.target.classList.contains('js-cmp')) { e.preventDefault(); send(); } });
+  function send() {
+    var t = $('#cmpT'), v = t.value.trim(); if (!v) { t.focus(); return; }
+    var m = { at: SD.fmtDT(SD.now()), who: SD.ME, side: 'us', text: v };
+    T.messages.push(m); t.value = '';
+    add({ type: 'msg', m: m });
+    $('#cmpT').focus({ preventScroll: true });
+    SD.toast('Сообщение отправлено', SD.call1C('comment', T.id));
+  }
+  SD.seg($('.js-sort'), function (v) { sort = v; renderFeed(false); });
+
+  SD.on('status', function (ev) {
+    var a = document.activeElement, wasSt = a && a.classList && (a.classList.contains('js-st2'));
+    add({ type: 'status', who: SD.ME, from: ev.from, to: ev.to, note: ev.note });
+    renderSum();
+    if (wasSt) { var b = $('.js-st2'); if (b) b.focus({ preventScroll: true }); }
+  });
+  SD.on('change', function () { renderSum(); });
+  SD.on('timer', function (e) {
+    if (e.type === 'stop') { var w = SD.addWork(e.rec); add({ type: 'work', w: w }); }
+    renderSum();
+  });
+  var lastMin = -1;
+  SD.on('tick', function () { var m = SD.now().getMinutes(); if (m !== lastMin) { lastMin = m; var w = $('.js-wait'); if (w) w.textContent = dur(T.statusAt); } });
+
+  $('.js-desc').innerHTML = T.desc;
+  renderSum();
+  renderFeed(false);
+  SD.timer.paint();
+})();
+</script>
+</body>
+</html>

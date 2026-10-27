@@ -20,7 +20,8 @@ x-dc{display:none}
 <script src="dc-lite.js"></script>
 </head>
 <body>
-<nav class="pnav" aria-label="Прототипы"><a href="./" aria-label="Все прототипы">☰ Все</a><a class="arrow" href="a-buttons.html" aria-label="Предыдущий прототип">‹</a><div class="tabs"><a href="a-buttons.html"><span class="key">А</span>Панель действий</a><a href="b-buttons.html" aria-current="page"><span class="key">Б</span>Меню «Ещё»</a><a href="c-buttons.html"><span class="key">В</span>Действия в строке</a><span class="sep" aria-hidden="true"></span><a href="p1-filters.html"><span class="key">1</span>Фильтры и вкладки</a><a href="p2-focus.html"><span class="key">2</span>Очередь</a><a href="p3-kanban.html"><span class="key">3</span>Канбан</a><a href="p4-sheet.html"><span class="key">4</span>Боковая карточка</a><a href="p5-day.html"><span class="key">5</span>Мой день</a></div><a class="arrow" href="c-buttons.html" aria-label="Следующий прототип">›</a></nav>
+<nav id="pnav" class="pnav" aria-label="Прототипы"></nav>
+<script src="nav.js"></script>
 <div id="dc-root"></div>
 <x-dc>
 <helmet>
